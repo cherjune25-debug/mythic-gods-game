@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Mythic Gods: Isometric Arena</title>
+<title>Mythic Gods: Full MOBA Map</title>
 <style>
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#174b36;color:#fff;font-family:system-ui,Arial;touch-action:none}
 canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
@@ -36,13 +36,13 @@ canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 <script>
 (()=>{
 const c=document.getElementById('game'),ctx=c.getContext('2d'),$=id=>document.getElementById(id);
-let W=0,H=0,dpr=1,chosen='zeus',running=false,last=0,joy={x:0,y:0},drag=false,keys={},hero=null,enemies=[],minions=[],shots=[],time=0,kos=0,gold=0,core;
+let W=0,H=0,dpr=1,chosen='zeus',running=false,last=0,joy={x:0,y:0},drag=false,keys={},hero=null,enemies=[],minions=[],shots=[],time=0,kos=0,gold=0,core,cam={x:0,y:0,ready:false};
 const MW=1500,MH=1000;
 const gods={zeus:{name:'ZEUS · THUNDER GOD',glyph:'⚡',color:'#5bd6ff',hp:1000,damage:55,speed:190,range:160},anubis:{name:'ANUBIS · SOUL KEEPER',glyph:'𓃥',color:'#d1a0ff',hp:1120,damage:50,speed:176,range:145},odin:{name:'ODIN · ALLFATHER',glyph:'🛡️',color:'#ffbb68',hp:1350,damage:68,speed:165,range:105}};
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
 function resize(){dpr=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;c.width=Math.round(W*dpr);c.height=Math.round(H*dpr);c.style.width=W+'px';c.style.height=H+'px'}addEventListener('resize',resize);resize();
 function spawn(team,x,y){return {team,x,y,hp:team==='blue'?150:260,maxHp:team==='blue'?150:260,r:team==='blue'?11:17,damage:team==='blue'?14:22,speed:team==='blue'?48:42,cd:Math.random(),color:team==='blue'?'#65d9ff':'#ff687a'}}
-function reset(){const g=gods[chosen];hero={x:170,y:500,r:20,hp:g.hp,maxHp:g.hp,damage:g.damage,speed:g.speed,range:g.range,color:g.color,glyph:g.glyph,level:1,dead:false};enemies=[];minions=[];shots=[];time=0;kos=0;gold=0;core={x:1370,y:500,hp:2400,maxHp:2400};for(let i=0;i<5;i++){minions.push(spawn('blue',230+i*18,475+i*12));minions.push(spawn('red',1200+i*18,515+i*12))}for(let i=0;i<6;i++)enemies.push(spawn('red',780+(i%3)*110,250+Math.floor(i/3)*480));running=true;$('start').style.display='none';$('message').textContent='Move with joystick. Attack enemies and destroy the red core!';}
+function reset(){const g=gods[chosen];hero={x:170,y:500,r:20,hp:g.hp,maxHp:g.hp,damage:g.damage,speed:g.speed,range:g.range,color:g.color,glyph:g.glyph,level:1,dead:false};cam.ready=false;enemies=[];minions=[];shots=[];time=0;kos=0;gold=0;core={x:1370,y:500,hp:2400,maxHp:2400};for(let i=0;i<5;i++){minions.push(spawn('blue',230+i*18,475+i*12));minions.push(spawn('red',1200+i*18,515+i*12))}for(let i=0;i<6;i++)enemies.push(spawn('red',780+(i%3)*110,250+Math.floor(i/3)*480));running=true;$('start').style.display='none';$('message').textContent='Move with joystick. Attack enemies and destroy the red core!';}
 function nearest(arr,a,r){let best=null,bd=r;for(const o of arr){if(o.hp<=0)continue;const d=dist(a,o);if(d<bd){bd=d;best=o}}return best}
 function hit(o,n){if(!o||o.hp<=0)return;o.hp=Math.max(0,o.hp-n);if(o.hp===0&&o.team==='red'){kos++;gold+=25}}
 function attack(){if(!running)return;let t=nearest([...enemies,...minions.filter(m=>m.team==='red')],hero,hero.range+45);if(t){hit(t,hero.damage);$('message').textContent='Hit enemy!'}else if(dist(hero,core)<hero.range+80){core.hp=Math.max(0,core.hp-hero.damage);$('message').textContent='Enemy core damaged!'}else $('message').textContent='Move closer to enemies or enemy core.'}
@@ -57,16 +57,27 @@ function project(x,y){return {x:500+(x-y)*0.5,y:28+(x+y)*0.32}}
 function drawUnit(o,isHero=false){const p=project(o.x,o.y),x=p.x,y=p.y,r=o.r*0.72;circle(x,y+5,r,'#14261b99');circle(x,y,r,o.color||(o.team==='blue'?'#55cfff':'#ff6478'),isHero?'#fff2a0':o.team==='blue'?'#b5efff':'#ffc2c8');ctx.fillStyle='#fff';ctx.font='bold 14px sans-serif';ctx.textAlign='center';ctx.fillText(isHero?o.glyph:o.team==='blue'?'•':'✦',x,y+5);ctx.fillStyle='#17201b';ctx.fillRect(x-r,y-r-9,r*2,4);ctx.fillStyle=isHero||o.team==='blue'?'#58e58a':'#ff455f';ctx.fillRect(x-r,y-r-9,r*2*Math.max(0,o.hp/o.maxHp),4);if(isHero){ctx.strokeStyle='#ffe88b';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(x,y,r+6,(r+6)*.62,0,0,Math.PI*2);ctx.stroke()}}
 function drawTree(x,y,size=1){ctx.fillStyle='#183c2a';ctx.beginPath();ctx.ellipse(x,y+8*size,19*size,9*size,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#654b32';ctx.fillRect(x-4*size,y-8*size,8*size,21*size);for(const a of [[0,-17,'#1b633b'],[-10,-9,'#267747'],[10,-8,'#31834a'],[0,0,'#3d9651']]){ctx.fillStyle=a[2];ctx.beginPath();ctx.arc(x+a[0]*size,y+a[1]*size,12*size,0,Math.PI*2);ctx.fill()}}
 function drawBush(x,y,size=1){ctx.fillStyle='#205c38';ctx.beginPath();ctx.ellipse(x,y,17*size,9*size,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#49a95b';ctx.beginPath();ctx.arc(x-7*size,y-2*size,7*size,0,Math.PI*2);ctx.arc(x+2*size,y-5*size,8*size,0,Math.PI*2);ctx.arc(x+9*size,y,6*size,0,Math.PI*2);ctx.fill()}
-function draw(){ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,W,H);ctx.fillStyle='#102c29';ctx.fillRect(0,0,W,H);const scale=Math.min(W/1500,H/1000);const ox=(W-1500*scale)/2,oy=(H-1000*scale)/2;ctx.save();ctx.translate(ox,oy);ctx.scale(scale,scale);
+function draw(){
+ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,W,H);ctx.fillStyle='#102c29';ctx.fillRect(0,0,W,H);
+// Smooth MOBA camera: follow the hero and keep the visible battlefield zoomed in.
+const target=hero?project(hero.x,hero.y):project(750,500);const zoom=Math.min(1.42,Math.max(1.12,H/650));
+if(!cam.ready){cam.x=target.x;cam.y=target.y;cam.ready=true}cam.x+=(target.x-cam.x)*0.13;cam.y+=(target.y-cam.y)*0.13;
+ctx.save();ctx.translate(W*0.5-cam.x*zoom,H*0.47-cam.y*zoom);ctx.scale(zoom,zoom);
 // Draw the battlefield as a diamond-shaped isometric world.
 ctx.save();ctx.transform(.5,.32,-.5,.32,500,28);ctx.fillStyle='#397d49';ctx.fillRect(0,0,MW,MH);
 for(let y=0;y<MH;y+=60)for(let x=0;x<MW;x+=60){ctx.fillStyle=((x/60+y/60)%2)?'#347648':'#3b824c';ctx.fillRect(x,y,60,60)}
 // Jungle clearing patches
 for(const [x,y,rx,ry] of [[250,130,150,95],[1240,140,150,95],[240,850,145,100],[1260,850,145,100],[540,330,90,70],[970,680,100,75]]){ctx.fillStyle='#2b6a3c';ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fill()}
+// Decorative terrain seams and small grass patches give the battlefield more depth.
+for(let y=55;y<MH;y+=95){for(let x=55;x<MW;x+=105){if(((x*3+y*7)%5)!==0){ctx.fillStyle=((x+y)%2)?'#438752':'#2f7042';ctx.beginPath();ctx.ellipse(x+((y%3)*5),y,13,6,((x+y)%9)/10,0,Math.PI*2);ctx.fill();}}}
+// Jungle camp clearings, stone rings, and ancient rune marks.
+for(const [x,y,r,col] of [[390,365,42,'#6b785b'],[1110,365,42,'#6b785b'],[390,635,42,'#6b785b'],[1110,635,42,'#6b785b'],[600,205,27,'#7e8469'],[900,795,27,'#7e8469']]){ctx.fillStyle='#245d37';ctx.beginPath();ctx.ellipse(x,y,r*1.35,r,0,0,Math.PI*2);ctx.fill();ctx.fillStyle=col;ctx.beginPath();ctx.ellipse(x,y,r,r*.72,0,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#b8b58d';ctx.lineWidth=3;ctx.setLineDash([7,6]);ctx.beginPath();ctx.ellipse(x,y,r*.72,r*.48,0,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);ctx.strokeStyle='#e2d7a4';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x-8,y);ctx.lineTo(x+8,y);ctx.moveTo(x,y-8);ctx.lineTo(x,y+8);ctx.stroke();}
 // Three broad lanes with stone edging and warm paving
 for(const y of [250,500,750]){ctx.lineCap='round';ctx.strokeStyle='#655f4d';ctx.lineWidth=100;ctx.beginPath();ctx.moveTo(28,y);ctx.lineTo(MW-28,y);ctx.stroke();ctx.strokeStyle='#b8b092';ctx.lineWidth=84;ctx.beginPath();ctx.moveTo(28,y);ctx.lineTo(MW-28,y);ctx.stroke();ctx.strokeStyle='#d6cba3';ctx.lineWidth=70;ctx.beginPath();ctx.moveTo(28,y);ctx.lineTo(MW-28,y);ctx.stroke();ctx.strokeStyle='#a79d7d';ctx.lineWidth=2;ctx.setLineDash([18,18]);ctx.beginPath();ctx.moveTo(35,y);ctx.lineTo(MW-35,y);ctx.stroke();ctx.setLineDash([])}
 // River, banks and crossings
 ctx.lineCap='round';ctx.strokeStyle='#c1b28a';ctx.lineWidth=82;ctx.beginPath();ctx.moveTo(750,10);ctx.bezierCurveTo(680,230,820,360,750,500);ctx.bezierCurveTo(680,650,820,790,750,990);ctx.stroke();ctx.strokeStyle='#217c9e';ctx.lineWidth=65;ctx.beginPath();ctx.moveTo(750,10);ctx.bezierCurveTo(680,230,820,360,750,500);ctx.bezierCurveTo(680,650,820,790,750,990);ctx.stroke();ctx.strokeStyle='#55b8ce';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(742,10);ctx.bezierCurveTo(672,230,812,360,742,500);ctx.bezierCurveTo(672,650,812,790,742,990);ctx.stroke();
+// Water glints and subtle current lines.
+ctx.strokeStyle='#83d9e5';ctx.lineWidth=2;ctx.globalAlpha=.65;for(let yy=45;yy<960;yy+=72){ctx.beginPath();ctx.moveTo(735+(yy%3)*3,yy);ctx.lineTo(750+(yy%3)*3,yy+13);ctx.stroke();ctx.beginPath();ctx.moveTo(765-(yy%4)*2,yy+25);ctx.lineTo(780-(yy%4)*2,yy+36);ctx.stroke();}ctx.globalAlpha=1;
 for(const y of [250,500,750]){ctx.fillStyle='#795b3c';ctx.fillRect(695,y-44,110,88);ctx.fillStyle='#c6a878';ctx.fillRect(701,y-37,98,74);ctx.strokeStyle='#6d5136';ctx.lineWidth=4;for(let k=-30;k<=30;k+=15){ctx.beginPath();ctx.moveTo(701,y+k);ctx.lineTo(799,y+k);ctx.stroke()}}
 // Stone jungle paths
 ctx.strokeStyle='#8c9270';ctx.lineWidth=28;ctx.lineCap='round';for(const [a,b,c,d] of [[380,170,520,330],[1120,170,980,330],[380,830,520,670],[1120,830,980,670]]){ctx.beginPath();ctx.moveTo(a,b);ctx.lineTo(c,d);ctx.stroke()}
@@ -74,6 +85,9 @@ ctx.strokeStyle='#8c9270';ctx.lineWidth=28;ctx.lineCap='round';for(const [a,b,c,
 function mapBase(x,y,color){ctx.fillStyle='#5a5b4c';ctx.beginPath();ctx.ellipse(x,y+4,64,52,0,0,Math.PI*2);ctx.fill();ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(x,y-48);ctx.lineTo(x+48,y);ctx.lineTo(x,y+48);ctx.lineTo(x-48,y);ctx.closePath();ctx.fill();ctx.strokeStyle='#f5e8bb';ctx.lineWidth=5;ctx.stroke();ctx.fillStyle='#f4e8ce';ctx.fillRect(x-18,y-18,36,36);ctx.fillStyle=color;ctx.fillRect(x-9,y-9,18,18)}
 mapBase(80,500,'#278dcc');mapBase(1420,500,'#b73555');
 for(const x of [390,1110])for(const y of [250,500,750]){ctx.fillStyle='#595c4d';ctx.beginPath();ctx.ellipse(x,y+4,37,30,0,0,Math.PI*2);ctx.fill();ctx.fillStyle=x<500?'#3b9bd0':'#d94d64';ctx.beginPath();ctx.moveTo(x,y-31);ctx.lineTo(x+30,y);ctx.lineTo(x,y+31);ctx.lineTo(x-30,y);ctx.closePath();ctx.fill();ctx.strokeStyle='#e8e4c9';ctx.lineWidth=3;ctx.stroke();ctx.fillStyle='#f7e8c8';ctx.fillRect(x-8,y-13,16,26);ctx.fillStyle=x<500?'#217cb6':'#a62c49';ctx.fillRect(x-4,y-8,8,16)}
+// Small glowing lane beacons, stone markers, and boundary rocks.
+for(const [x,y] of [[170,250],[610,250],[920,250],[1320,250],[170,750],[610,750],[920,750],[1320,750]]){ctx.fillStyle='#6c705c';ctx.beginPath();ctx.ellipse(x,y+5,13,9,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#e6d6a1';ctx.fillRect(x-5,y-15,10,19);ctx.fillStyle='#8ce5ee';ctx.beginPath();ctx.arc(x,y-17,5,0,Math.PI*2);ctx.fill();ctx.fillStyle='#8ce5ee33';ctx.beginPath();ctx.arc(x,y-17,12,0,Math.PI*2);ctx.fill();}
+for(let x=120;x<MW-80;x+=115){for(const y of [65,935]){ctx.fillStyle='#66765c';ctx.beginPath();ctx.ellipse(x,y,16,9,.2,0,Math.PI*2);ctx.fill();ctx.fillStyle='#879174';ctx.beginPath();ctx.ellipse(x-3,y-4,8,5,.2,0,Math.PI*2);ctx.fill();}}
 // Trees and brush patches decorate the jungle, deliberately kept off lane centers.
 for(const [x,y,z] of [[150,130,1.2],[225,185,1],[310,115,1.15],[450,120,.9],[1200,120,1.2],[1300,190,1],[1380,120,1.15],[1080,110,.9],[145,830,1.1],[230,900,1],[330,850,1.15],[450,900,.9],[1180,900,1.1],[1290,830,1],[1390,900,1.15],[1050,890,.9],[570,370,.8],[930,625,.9],[580,650,.8],[940,370,.8]])drawTree(x,y,z);
 for(const [x,y,z] of [[300,300,1],[460,345,.8],[280,680,1],[460,650,.8],[1050,340,.9],[1220,300,1],[1050,660,.9],[1220,700,1],[620,180,.8],[880,820,.8]])drawBush(x,y,z);
