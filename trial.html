@@ -21,16 +21,16 @@ canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 #objective{text-align:center;font-size:10px}
 #coreText{color:#ff687a;font-weight:900;font-size:12px}
 
-/* Mini-Map Radar (Top Right) */
+/* Mini-Map Radar */
 #minimap-wrap{position:relative;width:105px;height:80px;background:#09121be6;border:2px solid #ffffff44;border-radius:8px;overflow:hidden;box-shadow:0 3px 10px #0009}
 #minimap{width:100%;height:100%;display:block}
 
 #message{position:absolute;top:90px;left:50%;transform:translateX(-50%);font-size:11px;background:#101a2bee;padding:6px 14px;border-radius:20px;border:1px solid #ffdc7855;max-width:92%;text-align:center;color:#ffeaa7}
 
 /* Bottom Controls */
-#controls{position:absolute;bottom:12px;left:12px;right:12px;display:flex;justify-content:space-between;align-items:flex-end}
-#joy{width:116px;height:116px;border:2px solid #ffffff66;background:#101b2a99;border-radius:50%;position:relative;pointer-events:auto;touch-action:none}
-#stick{position:absolute;width:44px;height:44px;left:34px;top:34px;border-radius:50%;background:radial-gradient(circle,#91baff,#406ea8);border:2px solid #fff;box-shadow:0 0 10px #6ba3ff99}
+#controls{position:absolute;bottom:12px;left:12px;right:12px;display:flex;justify-content:space-between;align-items:flex-end;pointer-events:none}
+#joy{width:120px;height:120px;border:2px solid #ffffff66;background:#101b2a99;border-radius:50%;position:relative;pointer-events:auto;touch-action:none}
+#stick{position:absolute;width:46px;height:46px;left:37px;top:37px;border-radius:50%;background:radial-gradient(circle,#91baff,#406ea8);border:2px solid #fff;box-shadow:0 0 10px #6ba3ff99;pointer-events:none}
 
 #buttons{display:grid;grid-template-columns:repeat(2,64px);gap:10px;pointer-events:auto}
 .action{width:64px;height:64px;border-radius:50%;border:2px solid #ffffff88;background:#1a283eee;color:white;font-weight:900;font-size:10px;touch-action:none;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;cursor:pointer}
@@ -117,7 +117,7 @@ canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 <script>
 (()=>{
 /* ==========================================================================
-   WEB AUDIO API - SYNTHESIZED SOUND FX (100% Offline)
+   WEB AUDIO API
    ========================================================================== */
 const actx=new(window.AudioContext||window.webkitAudioContext)();
 function playSfx(type){
@@ -144,17 +144,21 @@ function playSfx(type){
 }
 
 /* ==========================================================================
-   MAP ENGINE: 3-LANE MLBB 2.5D ARENA
+   GAME ENGINE & VARIABLES
    ========================================================================== */
 const c=document.getElementById('game'),ctx=c.getContext('2d');
 const mm=document.getElementById('minimap'),mmCtx=mm.getContext('2d');
 let W=0,H=0,dpr=1,running=false,chosen='ryu',last=0;
-const MW=2000,MH=1400; // Expanded Authentic 3-Lane Dimension
-const joy={x:0,y:0},drag=false,keys={};
+const MW=2000,MH=1400;
+
+// CONTROLLER STATE: Correctly declared with LET so they can be modified!
+let joy={x:0,y:0};
+let drag=false;
+let keys={};
+
 let hero=null,core=null,towers=[],minions=[],enemies=[],camps=[],shots=[],particles=[],floats=[],bushes=[];
 let attackCd=0,skillCds={s1:0,s2:0,ult:0},waveTimer=0,shake=0;
 
-// Anime Champions
 const HEROES={
   ryu:{name:'RYU · SHADOW BLADE',glyph:'⚔',color:'#50e3c2',hp:1100,mp:600,damage:78,speed:215,range:75,
        s1:{name:'Wind Cutter',cd:3.5,range:260,dmg:150},s2:{name:'Flash Step',cd:6.0,range:220,dmg:120},ult:{name:'Omnislash',cd:18,range:300,dmg:440}},
@@ -173,7 +177,6 @@ function resize(){
 }
 addEventListener('resize',resize);resize();
 
-// 2.5D Isometric Transform (Map coordinate -> Screen space)
 function project(x,y){
   return {x:550+(x-y)*0.65, y:40+(x+y)*0.32};
 }
@@ -181,7 +184,7 @@ const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 
 /* ==========================================================================
-   RESET & SETUP GAMEPLAY
+   RESET & SETUP
    ========================================================================== */
 function resetGame(){
   const h=HEROES[chosen];
@@ -191,7 +194,6 @@ function resetGame(){
   towers=[];minions=[];enemies=[];camps=[];shots=[];particles=[];floats=[];
   attackCd=0;skillCds={s1:0,s2:0,ult:0};waveTimer=0;
 
-  // Real 3-Lane Tower Setup (Top, Mid, Bot lanes for Blue and Red)
   // Top Lane Towers
   towers.push({team:'blue',lane:'top',x:380,y:250,hp:2200,maxHp:2200,range:180,damage:80,cd:0});
   towers.push({team:'blue',lane:'top',x:850,y:250,hp:2200,maxHp:2200,range:180,damage:80,cd:0});
@@ -210,7 +212,6 @@ function resetGame(){
   towers.push({team:'red',lane:'bot',x:1200,y:1150,hp:2200,maxHp:2200,range:180,damage:80,cd:0});
   towers.push({team:'red',lane:'bot',x:1620,y:1150,hp:2200,maxHp:2200,range:180,damage:80,cd:0});
 
-  // 4 Jungle Quadrant Camps
   camps=[
     {x:600,y:450,name:'Blue Golem',color:'#3498db',hp:950,maxHp:950,r:24,damage:30,cd:1,alive:true,respawn:0},
     {x:1400,y:450,name:'Red Beast',color:'#e74c3c',hp:950,maxHp:950,r:24,damage:30,cd:1,alive:true,respawn:0},
@@ -219,7 +220,6 @@ function resetGame(){
     {x:1000,y:700,name:'Lord Pit',color:'#f39c12',hp:2500,maxHp:2500,r:32,damage:55,cd:1,alive:true,respawn:0}
   ];
 
-  // Bushes (Tall Grass Ambushes)
   bushes=[
     {x:720,y:250,r:45},{x:1280,y:250,r:45},
     {x:720,y:700,r:45},{x:1280,y:700,r:45},
@@ -227,7 +227,6 @@ function resetGame(){
     {x:1000,y:520,r:50},{x:1000,y:880,r:50}
   ];
 
-  // Spawn Enemy Bots
   enemies.push({team:'red',name:'Shadow Bot',x:1250,y:700,r:20,hp:1100,maxHp:1100,damage:50,speed:175,color:'#ff6b81',cd:1});
   enemies.push({team:'red',name:'Anime Rival',x:1300,y:250,r:20,hp:1050,maxHp:1050,damage:48,speed:180,color:'#ff4757',cd:1});
 
@@ -237,7 +236,6 @@ function resetGame(){
 }
 
 function spawnMinionWave(){
-  // Spawn in Top, Mid, and Bot lanes
   const lanes=['top','mid','bot'];
   for(const lane of lanes){
     let y=lane==='top'?250:lane==='mid'?700:1150;
@@ -246,9 +244,6 @@ function spawnMinionWave(){
   }
 }
 
-/* ==========================================================================
-   ANIME COMBAT & SKILLS
-   ========================================================================== */
 function spawnFloatingText(x,y,text,color='#fff'){
   floats.push({x,y,text,color,life:0.9,vy:-30});
 }
@@ -258,7 +253,6 @@ function basicAttack(){
   attackCd=0.45;
   playSfx('slash');
 
-  // Find nearest target
   const pool=[...enemies,...minions.filter(m=>m.team==='red'),...towers.filter(t=>t.team==='red'&&t.hp>0),...camps.filter(c=>c.alive)];
   if(core&&core.hp>0)pool.push(core);
 
@@ -288,13 +282,11 @@ function castSkill(id){
 
   if(chosen==='ryu'){
     if(id==='s1'){
-      // Wind Cutter (3 wave slashes)
       playSfx('slash');
       for(let i=-1;i<=1;i++){
         shots.push({x:hero.x,y:hero.y,vx:Math.cos(i*0.25)*450,vy:Math.sin(i*0.25)*450,dmg:sk.dmg,team:'blue',life:0.55,color:'#50e3c2',r:14});
       }
     }else if(id==='s2'){
-      // Flash Step (Teleport forward in movement direction + slash AOE)
       playSfx('dash');
       hero.x=clamp(hero.x+(joy.x||1)*180,80,MW-80);
       hero.y=clamp(hero.y+(joy.y||0)*180,80,MH-80);
@@ -302,7 +294,6 @@ function castSkill(id){
       createParticles(hero.x,hero.y,25,'#50e3c2');
       hitEnemiesInArea(hero.x,hero.y,130,sk.dmg);
     }else if(id==='ult'){
-      // Omnislash (Rapid multi-target slashes)
       playSfx('thunder');
       shake=16;
       let targets=[...enemies,...minions.filter(m=>m.team==='red'),...towers.filter(t=>t.team==='red')].filter(e=>dist(hero,e)<sk.range);
@@ -314,7 +305,6 @@ function castSkill(id){
     }
   }else if(chosen==='gojo'){
     if(id==='s1'){
-      // Blue Vortex (Pull enemies and crush)
       playSfx('beam');
       const tx=hero.x+220,ty=hero.y;
       createParticles(tx,ty,35,'#74b9ff');
@@ -326,30 +316,25 @@ function castSkill(id){
         }
       });
     }else if(id==='s2'){
-      // Reversal Red (Knockback burst)
       playSfx('thunder');
       shake=10;
       createParticles(hero.x,hero.y,30,'#ff7675');
       hitEnemiesInArea(hero.x,hero.y,160,sk.dmg);
     }else if(id==='ult'){
-      // Hollow Purple (Screen-clearing giant sphere)
       playSfx('beam');shake=20;
       shots.push({x:hero.x,y:hero.y,vx:420,vy:0,dmg:sk.dmg,team:'blue',life:1.6,color:'#a29bfe',r:40,pierce:true});
     }
   }else if(chosen==='raiden'){
     if(id==='s1'){
-      // Lightning Shuriken
       playSfx('thunder');
       shots.push({x:hero.x,y:hero.y,vx:550,vy:(joy.y||0)*200,dmg:sk.dmg,team:'blue',life:0.7,color:'#f1c40f',r:16});
     }else if(id==='s2'){
-      // Chidori Rush
       playSfx('dash');
       hero.x=clamp(hero.x+220,80,MW-80);
       shake=8;
       createParticles(hero.x,hero.y,20,'#f1c40f');
       hitEnemiesInArea(hero.x,hero.y,120,sk.dmg);
     }else if(id==='ult'){
-      // Kirin Thunder Dragon (Global Strike)
       playSfx('thunder');shake=22;
       [...enemies,...minions.filter(m=>m.team==='red'),core].forEach(t=>{
         if(dist(hero,t)<sk.range){
@@ -386,43 +371,43 @@ function createParticles(x,y,count,color){
 function update(dt){
   if(!running)return;
 
-  // Wave Timer (every 22s)
   waveTimer-=dt;
   if(waveTimer<=0){
     spawnMinionWave();
     waveTimer=22;
   }
 
-  // Cooldown timers
   attackCd=Math.max(0,attackCd-dt);
   for(const k in skillCds)skillCds[k]=Math.max(0,skillCds[k]-dt);
 
-  // Update Skill Overlay UI
   const h=HEROES[chosen];
   document.getElementById('cd-s1').style.height=(skillCds.s1/h.s1.cd*100)+'%';
   document.getElementById('cd-s2').style.height=(skillCds.s2/h.s2.cd*100)+'%';
   document.getElementById('cd-ult').style.height=(skillCds.ult/h.ult.cd*100)+'%';
 
-  // Hero Movement
-  let mx=joy.x+(keys.ArrowRight||keys.d?1:0)-(keys.ArrowLeft||keys.a?1:0);
-  let my=joy.y+(keys.ArrowDown||keys.s?1:0)-(keys.ArrowUp||keys.w?1:0);
+  // KEYBOARD WASD & JOYSTICK MOVEMENT: Fully case-insensitive!
+  let mx = joy.x;
+  let my = joy.y;
+
+  if (keys['arrowright'] || keys['d']) mx += 1;
+  if (keys['arrowleft']  || keys['a']) mx -= 1;
+  if (keys['arrowdown']  || keys['s']) my += 1;
+  if (keys['arrowup']    || keys['w']) my -= 1;
+
   const len=Math.hypot(mx,my);
   if(len>1){mx/=len;my/=len;}
+
   hero.x=clamp(hero.x+mx*hero.speed*dt,60,MW-60);
   hero.y=clamp(hero.y+my*hero.speed*dt,60,MH-60);
 
-  // Bush Check (Stealth)
   hero.inBush=bushes.some(b=>dist(hero,b)<b.r);
 
-  // Passive HP/MP Regen
   hero.hp=Math.min(hero.maxHp,hero.hp+8*dt);
   hero.mp=Math.min(hero.maxMp,hero.mp+12*dt);
 
-  // Update Projectiles
   for(let i=shots.length-1;i>=0;i--){
     const s=shots[i];
     s.x+=s.vx*dt;s.y+=s.vy*dt;s.life-=dt;
-    // Collision with enemies
     [...enemies,...minions.filter(m=>m.team==='red'),...towers.filter(t=>t.team==='red'&&t.hp>0),core].forEach(e=>{
       if(dist(s,e)<s.r+20){
         e.hp=Math.max(0,e.hp-s.dmg);
@@ -433,7 +418,6 @@ function update(dt){
     if(s.life<=0)shots.splice(i,1);
   }
 
-  // Update Minions (Push down lanes)
   for(const m of minions){
     if(m.hp<=0)continue;
     const foes=m.team==='blue'?[...enemies,...minions.filter(q=>q.team==='red')]:[hero,...minions.filter(q=>q.team==='blue')];
@@ -450,12 +434,10 @@ function update(dt){
         m.cd=1.2;
       }
     }else{
-      // Move along lane towards enemy base
       m.x+=(m.team==='blue'?1:-1)*m.speed*dt;
     }
   }
 
-  // Update Towers (Fire at incoming foes)
   for(const tw of towers){
     if(tw.hp<=0)continue;
     tw.cd-=dt;
@@ -470,7 +452,6 @@ function update(dt){
     }
   }
 
-  // Update Jungle Camps
   for(const c of camps){
     if(!c.alive){
       c.respawn-=dt;
@@ -486,7 +467,6 @@ function update(dt){
     }
   }
 
-  // Floating text & particles
   for(let i=floats.length-1;i>=0;i--){
     const f=floats[i];f.y+=f.vy*dt;f.life-=dt;
     if(f.life<=0)floats.splice(i,1);
@@ -496,11 +476,9 @@ function update(dt){
     if(p.life<=0)particles.splice(i,1);
   }
 
-  // Cleanup dead units
   minions=minions.filter(m=>m.hp>0);
   enemies=enemies.filter(e=>e.hp>0);
 
-  // Victory / Defeat check
   if(core.hp<=0){
     running=false;
     document.getElementById('message').textContent='VICTORY! The Enemy Core has fallen!';
@@ -513,7 +491,6 @@ function update(dt){
     document.getElementById('play').textContent='TRY AGAIN';
   }
 
-  // HUD updates
   document.getElementById('hpFill').style.width=(hero.hp/hero.maxHp*100)+'%';
   document.getElementById('mpFill').style.width=(hero.mp/hero.maxMp*100)+'%';
   document.getElementById('stats').textContent=`HP ${Math.ceil(hero.hp)} / ${hero.maxHp}`;
@@ -521,36 +498,28 @@ function update(dt){
 }
 
 /* ==========================================================================
-   RENDER 2.5D ISOMETRIC GRAPHICS
+   RENDER 2.5D
    ========================================================================== */
 function drawTerrain(){
-  // Main Grass Ground
   ctx.fillStyle='#1e3a29';
   ctx.fillRect(0,0,MW,MH);
 
-  // 3 Stone Lanes (Top, Mid, Bot)
   ctx.lineWidth=78;ctx.lineCap='round';ctx.strokeStyle='#4a5568';
-  // Top Lane
   ctx.beginPath();ctx.moveTo(100,250);ctx.lineTo(MW-100,250);ctx.stroke();
-  // Mid Lane
   ctx.beginPath();ctx.moveTo(100,700);ctx.lineTo(MW-100,700);ctx.stroke();
-  // Bot Lane
   ctx.beginPath();ctx.moveTo(100,1150);ctx.lineTo(MW-100,1150);ctx.stroke();
 
-  // Lane Connectors (Bases to outer lanes)
   ctx.beginPath();ctx.moveTo(200,700);ctx.lineTo(380,250);ctx.stroke();
   ctx.beginPath();ctx.moveTo(200,700);ctx.lineTo(380,1150);ctx.stroke();
   ctx.beginPath();ctx.moveTo(MW-200,700);ctx.lineTo(MW-380,250);ctx.stroke();
   ctx.beginPath();ctx.moveTo(MW-200,700);ctx.lineTo(MW-380,1150);ctx.stroke();
 
-  // River Crossing (Diagonal Center Water Flow)
   ctx.strokeStyle='#1b728d';ctx.lineWidth=95;
   ctx.beginPath();
   ctx.moveTo(1250,20);
   ctx.bezierCurveTo(1100,450,900,950,750,MH-20);
   ctx.stroke();
 
-  // Bridges over River
   for(const y of [250,700,1150]){
     const bx=y===250?1160:y===700?1000:840;
     ctx.fillStyle='#855a30';
@@ -559,7 +528,6 @@ function drawTerrain(){
     ctx.strokeRect(bx-45,y-38,90,76);
   }
 
-  // Tall Grass / Bushes
   for(const b of bushes){
     ctx.fillStyle='#27ae60aa';
     ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,Math.PI*2);ctx.fill();
@@ -574,7 +542,6 @@ function drawMiniMap(){
 
   const sx=mm.width/MW,sy=mm.height/MH;
 
-  // Draw Lanes
   mmCtx.strokeStyle='#4a5568';mmCtx.lineWidth=2;
   mmCtx.beginPath();
   mmCtx.moveTo(0,250*sy);mmCtx.lineTo(mm.width,250*sy);
@@ -582,20 +549,17 @@ function drawMiniMap(){
   mmCtx.moveTo(0,1150*sy);mmCtx.lineTo(mm.width,1150*sy);
   mmCtx.stroke();
 
-  // Towers
   for(const tw of towers){
     if(tw.hp<=0)continue;
     mmCtx.fillStyle=tw.team==='blue'?'#54a0ff':'#ff6b6b';
     mmCtx.fillRect(tw.x*sx-1.5,tw.y*sy-1.5,3,3);
   }
 
-  // Minions
   for(const m of minions){
     mmCtx.fillStyle=m.team==='blue'?'#00d2d3':'#ee5253';
     mmCtx.fillRect(m.x*sx-1,m.y*sy-1,2,2);
   }
 
-  // Hero (Bright Yellow dot)
   if(hero){
     mmCtx.fillStyle='#ffdc78';
     mmCtx.beginPath();mmCtx.arc(hero.x*sx,hero.y*sy,3,0,Math.PI*2);mmCtx.fill();
@@ -606,14 +570,12 @@ function draw(){
   ctx.setTransform(dpr,0,0,dpr,0,0);
   ctx.clearRect(0,0,W,H);
 
-  // Screen Shake
   let ox=0,oy=0;
   if(shake>0){
     ox=(Math.random()-0.5)*shake;oy=(Math.random()-0.5)*shake;
     shake*=0.88;
   }
 
-  // Smooth Camera centering on hero
   const camX=hero?project(hero.x,hero.y).x:500;
   const camY=hero?project(hero.x,hero.y).y:300;
   const zoom=Math.min(1.2,Math.max(0.9,H/700));
@@ -622,13 +584,11 @@ function draw(){
   ctx.translate(W*0.5-camX*zoom+ox, H*0.48-camY*zoom+oy);
   ctx.scale(zoom,zoom);
 
-  // Transform 2D map into 2.5D Isometric Ground
   ctx.save();
   ctx.transform(0.65, 0.32, -0.65, 0.32, 550, 40);
   drawTerrain();
   ctx.restore();
 
-  // Draw Towers
   for(const tw of towers){
     if(tw.hp<=0)continue;
     const p=project(tw.x,tw.y),blue=tw.team==='blue';
@@ -640,13 +600,11 @@ function draw(){
     ctx.fillStyle=blue?'#54a0ff':'#ff6b6b';
     ctx.beginPath();ctx.arc(p.x,p.y-44,14,0,Math.PI*2);ctx.fill();
 
-    // HP Bar
     ctx.fillStyle='#000';ctx.fillRect(p.x-18,p.y-62,36,4);
     ctx.fillStyle=blue?'#2ecc71':'#e74c3c';
     ctx.fillRect(p.x-18,p.y-62,36*(tw.hp/tw.maxHp),4);
   }
 
-  // Draw Enemy Core Nexus
   if(core&&core.hp>0){
     const cp=project(core.x,core.y);
     ctx.fillStyle='#c0392b';
@@ -654,7 +612,6 @@ function draw(){
     ctx.strokeStyle='#ff7675';ctx.lineWidth=4;ctx.stroke();
   }
 
-  // Draw Jungle Monsters
   for(const c of camps){
     if(!c.alive)continue;
     const p=project(c.x,c.y);
@@ -666,7 +623,6 @@ function draw(){
     ctx.fillText(c.name,p.x,p.y-26);
   }
 
-  // Draw Minions
   for(const m of minions){
     if(m.hp<=0)continue;
     const p=project(m.x,m.y);
@@ -674,7 +630,6 @@ function draw(){
     ctx.beginPath();ctx.arc(p.x,p.y-6,m.r*0.7,0,Math.PI*2);ctx.fill();
   }
 
-  // Draw Shots / Anime Beams
   for(const s of shots){
     const sp=project(s.x,s.y);
     ctx.fillStyle=s.color;ctx.shadowColor=s.color;ctx.shadowBlur=12;
@@ -682,21 +637,18 @@ function draw(){
     ctx.shadowBlur=0;
   }
 
-  // Draw Hero
   if(hero){
     const hp=project(hero.x,hero.y);
     ctx.save();
-    if(hero.inBush)ctx.globalAlpha=0.45; // Stealth Transparency
+    if(hero.inBush)ctx.globalAlpha=0.45;
 
     ctx.fillStyle='rgba(0,0,0,0.35)';
     ctx.beginPath();ctx.ellipse(hp.x,hp.y+6,20,10,0,0,Math.PI*2);ctx.fill();
 
-    // Anime Aura ring
     ctx.strokeStyle=hero.color;ctx.lineWidth=3;ctx.shadowColor=hero.color;ctx.shadowBlur=15;
     ctx.beginPath();ctx.ellipse(hp.x,hp.y-10,hero.r,hero.r*0.65,0,0,Math.PI*2);ctx.stroke();
     ctx.shadowBlur=0;
 
-    // Hero Avatar
     ctx.fillStyle=hero.color;
     ctx.beginPath();ctx.arc(hp.x,hp.y-15,hero.r*0.75,0,Math.PI*2);ctx.fill();
     ctx.fillStyle='#111';ctx.font='bold 14px sans-serif';ctx.textAlign='center';
@@ -704,14 +656,12 @@ function draw(){
     ctx.restore();
   }
 
-  // Draw Particles
   for(const p of particles){
     const pp=project(p.x,p.y);
     ctx.fillStyle=p.color;
     ctx.beginPath();ctx.arc(pp.x,pp.y,3,0,Math.PI*2);ctx.fill();
   }
 
-  // Draw Floating Damage Texts
   for(const f of floats){
     const fp=project(f.x,f.y);
     ctx.fillStyle=f.color;ctx.font='bold 14px sans-serif';ctx.textAlign='center';
@@ -732,26 +682,54 @@ function loop(now){
 }
 
 /* ==========================================================================
-   TOUCH JOYSTICK & BUTTON CONTROLS
+   FIXED TOUCH & JOYSTICK CONTROLLER (100% Mobile & PC Responsive)
    ========================================================================== */
 const joyEl=document.getElementById('joy'),stick=document.getElementById('stick');
-function setJoy(e){
+
+function updateStickPos(clientX, clientY){
   const r=joyEl.getBoundingClientRect();
-  const dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2);
-  const max=r.width*0.35,d=Math.hypot(dx,dy);
-  joy.x=(d?dx/d*Math.min(d,max):0)/max;
-  joy.y=(d?dy/d*Math.min(d,max):0)/max;
-  stick.style.left=(r.width/2-22+joy.x*max)+'px';
-  stick.style.top=(r.height/2-22+joy.y*max)+'px';
+  const centerX=r.left+r.width/2;
+  const centerY=r.top+r.height/2;
+  const dx=clientX-centerX;
+  const dy=clientY-centerY;
+  const max=r.width*0.35;
+  const d=Math.hypot(dx,dy);
+
+  joy.x = (d ? (dx/d)*Math.min(d,max) : 0) / max;
+  joy.y = (d ? (dy/d)*Math.min(d,max) : 0) / max;
+
+  stick.style.transform = `translate(${joy.x*max}px, ${joy.y*max}px)`;
 }
-joyEl.addEventListener('pointerdown',e=>{drag=true;joyEl.setPointerCapture(e.pointerId);setJoy(e);});
-joyEl.addEventListener('pointermove',e=>{if(drag)setJoy(e);});
-function releaseJoy(){
-  drag=false;joy.x=0;joy.y=0;
-  stick.style.left='calc(50% - 22px)';stick.style.top='calc(50% - 22px)';
+
+function handleJoyStart(e){
+  drag=true;
+  const touch = e.touches ? e.touches[0] : e;
+  updateStickPos(touch.clientX, touch.clientY);
 }
-joyEl.addEventListener('pointerup',releaseJoy);
-joyEl.addEventListener('pointercancel',releaseJoy);
+
+function handleJoyMove(e){
+  if(!drag) return;
+  const touch = e.touches ? e.touches[0] : e;
+  updateStickPos(touch.clientX, touch.clientY);
+}
+
+function handleJoyEnd(){
+  drag=false;
+  joy.x=0;
+  joy.y=0;
+  stick.style.transform='translate(0px, 0px)';
+}
+
+// Touch events for mobile
+joyEl.addEventListener('touchstart', e=>{ e.preventDefault(); handleJoyStart(e); }, {passive:false});
+window.addEventListener('touchmove', e=>{ if(drag){ e.preventDefault(); handleJoyMove(e); } }, {passive:false});
+window.addEventListener('touchend', handleJoyEnd);
+window.addEventListener('touchcancel', handleJoyEnd);
+
+// Mouse fallback for PC testing
+joyEl.addEventListener('mousedown', handleJoyStart);
+window.addEventListener('mousemove', handleJoyMove);
+window.addEventListener('mouseup', handleJoyEnd);
 
 // Action Buttons
 document.getElementById('attack').addEventListener('pointerdown',e=>{e.preventDefault();basicAttack();});
@@ -769,15 +747,19 @@ document.querySelectorAll('.hero-card').forEach(b=>{
 });
 document.getElementById('play').addEventListener('click',resetGame);
 
-// PC Keyboard Support
+// PC Keyboard Support (Fully Case-Insensitive)
 addEventListener('keydown',e=>{
-  keys[e.key]=true;
-  if(e.key===' ')basicAttack();
-  if(e.key==='1')castSkill('s1');
-  if(e.key==='2')castSkill('s2');
-  if(e.key==='3')castSkill('ult');
+  const k = e.key.toLowerCase();
+  keys[k] = true;
+  if(e.key===' ') basicAttack();
+  if(e.key==='1') castSkill('s1');
+  if(e.key==='2') castSkill('s2');
+  if(e.key==='3') castSkill('ult');
 });
-addEventListener('keyup',e=>keys[e.key]=false);
+addEventListener('keyup',e=>{
+  const k = e.key.toLowerCase();
+  keys[k] = false;
+});
 
 requestAnimationFrame(loop);
 })();
