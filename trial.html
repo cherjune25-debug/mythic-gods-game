@@ -355,19 +355,6 @@ function draw(){
 function loop(now){let dt=Math.min(.04,(now-last)/1000);last=now;update(dt);draw();requestAnimationFrame(loop)}
 requestAnimationFrame(loop);
 
-// Joystick touch handling
-const joyEl=document.getElementById('joy'),knob=document.getElementById('knob');
-function moveJoy(e){
- let r=joyEl.getBoundingClientRect(),dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2),max=r.width*.34,l=Math.hypot(dx,dy);
- if(l>max){dx*=max/l;dy*=max/l}
- joy.x=dx/max;joy.y=dy/max;
- knob.style.left=(r.width/2-22+dx)+'px';knob.style.top=(r.height/2-22+dy)+'px';
-}
-joyEl.addEventListener('pointerdown',e=>{e.preventDefault();joyEl.setPointerCapture(e.pointerId);moveJoy(e)});
-joyEl.addEventListener('pointermove',e=>{if(e.buttons||e.pressure)moveJoy(e)});
-function endJoy(){joy.x=joy.y=0;knob.style.left='';knob.style.top=''}
-joyEl.addEventListener('pointerup',endJoy);joyEl.addEventListener('pointercancel',endJoy);
-
 // Tap a visible enemy on the arena to attack it.
 canvas.addEventListener('pointerdown',e=>{
  if(e.clientY>H*.68)return;
