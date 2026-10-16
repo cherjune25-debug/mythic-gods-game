@@ -38,25 +38,60 @@ canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 // TERRAIN UPGRADE v2: layered ridges, detailed stone lanes, deeper riverbanks, shaded trees and faceted bases.
 const c=document.getElementById('game'),ctx=c.getContext('2d'),$=id=>document.getElementById(id);
 let W=0,H=0,dpr=1,chosen='zeus',running=false,last=0,joy={x:0,y:0},drag=false,keys={},hero=null,enemies=[],minions=[],shots=[],towers=[],camps=[],time=0,kos=0,gold=0,core,cam={x:0,y:0,ready:false};
+// MOBA balance: attacks and skills have cooldowns; structures take reduced damage.
+let attackCd=0,skillCds={s1:0,s2:0,ult:0};
+const SKILL_COOLDOWNS={s1:5,s2:8,ult:24};
 const MW=1500,MH=1000;
 const gods={zeus:{name:'ZEUS · THUNDER GOD',glyph:'⚡',color:'#5bd6ff',hp:1000,damage:55,speed:190,range:160},anubis:{name:'ANUBIS · SOUL KEEPER',glyph:'𓃥',color:'#d1a0ff',hp:1120,damage:50,speed:176,range:145},odin:{name:'ODIN · ALLFATHER',glyph:'🛡️',color:'#ffbb68',hp:1350,damage:68,speed:165,range:105}};
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
 function resize(){dpr=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;c.width=Math.round(W*dpr);c.height=Math.round(H*dpr);c.style.width=W+'px';c.style.height=H+'px'}addEventListener('resize',resize);resize();
-function spawn(team,x,y){return {team,x,y,hp:team==='blue'?150:260,maxHp:team==='blue'?150:260,r:team==='blue'?11:17,damage:team==='blue'?14:22,speed:team==='blue'?48:42,cd:Math.random(),color:team==='blue'?'#65d9ff':'#ff687a'}}
-function reset(){const g=gods[chosen];hero={x:170,y:500,r:20,hp:g.hp,maxHp:g.hp,damage:g.damage,speed:g.speed,range:g.range,color:g.color,glyph:g.glyph,level:1,dead:false};cam.ready=false;enemies=[];minions=[];shots=[];time=0;kos=0;gold=0;core={x:1370,y:500,hp:2400,maxHp:2400};towers=[];for(const y of [250,500,750]){for(const x of [260,520])towers.push({team:'blue',x,y,hp:1250,maxHp:1250,r:25,range:175,damage:55,cd:.4});for(const x of [980,1240])towers.push({team:'red',x,y,hp:1250,maxHp:1250,r:25,range:175,damage:55,cd:.7});}camps=[[390,365,'Golem','#b7b9a7',480],[1110,365,'Ember Beast','#e88b54',430],[390,635,'Stone Brute','#a9b6c4',480],[1110,635,'Void Beast','#b88cff',430],[600,205,'Blue Sentinel','#56c9ff',650],[900,795,'Crimson Sentinel','#ff6a7b',650]].map(([x,y,name,color,hp])=>({x,y,name,color,hp,maxHp:hp,r:21,damage:35,cd:1,alive:true,respawn:0}));for(let i=0;i<5;i++){minions.push(spawn('blue',230+i*18,475+i*12));minions.push(spawn('red',1200+i*18,515+i*12))}for(let i=0;i<6;i++)enemies.push(spawn('red',780+(i%3)*110,250+Math.floor(i/3)*250));running=true;$('start').style.display='none';$('message').textContent='2.5D TERRAIN: destroy towers, farm jungle camps, push the red core!';}
+function spawn(team,x,y){const blue=team==='blue';return {team,x,y,hp:blue?240:300,maxHp:blue?240:300,r:blue?11:17,damage:blue?18:24,speed:blue?48:42,cd:Math.random(),color:blue?'#65d9ff':'#ff687a'}}
+function reset(){const g=gods[chosen];hero={x:170,y:500,r:20,hp:g.hp,maxHp:g.hp,damage:g.damage,speed:g.speed,range:g.range,color:g.color,glyph:g.glyph,level:1,dead:false};attackCd=0;skillCds={s1:0,s2:0,ult:0};cam.ready=false;enemies=[];minions=[];shots=[];time=0;kos=0;gold=0;core={x:1370,y:500,hp:3500,maxHp:3500};towers=[];for(const y of [250,500,750]){for(const x of [260,520])towers.push({team:'blue',x,y,hp:2000,maxHp:2000,r:25,range:175,damage:70,cd:.4});for(const x of [980,1240])towers.push({team:'red',x,y,hp:2000,maxHp:2000,r:25,range:175,damage:70,cd:.7});}camps=[[390,365,'Golem','#b7b9a7',750],[1110,365,'Ember Beast','#e88b54',700],[390,635,'Stone Brute','#a9b6c4',750],[1110,635,'Void Beast','#b88cff',700],[600,205,'Blue Sentinel','#56c9ff',1050],[900,795,'Crimson Sentinel','#ff6a7b',1050]].map(([x,y,name,color,hp])=>({x,y,name,color,hp,maxHp:hp,r:21,damage:24,cd:1,alive:true,respawn:0}));for(let i=0;i<5;i++){minions.push(spawn('blue',230+i*18,475+i*12));minions.push(spawn('red',1200+i*18,515+i*12))}for(let i=0;i<6;i++)enemies.push(spawn('red',780+(i%3)*110,250+Math.floor(i/3)*250));running=true;$('start').style.display='none';$('message').textContent='2.5D TERRAIN: destroy towers, farm jungle camps, push the red core!';}
 function nearest(arr,a,r){let best=null,bd=r;for(const o of arr){if(o.hp<=0)continue;const d=dist(a,o);if(d<bd){bd=d;best=o}}return best}
 function hit(o,n){if(!o||o.hp<=0)return;o.hp=Math.max(0,o.hp-n);if(o.hp===0&&o.team==='red'){kos++;gold+=25}}
-function attack(){if(!running)return;let t=nearest([...enemies,...minions.filter(m=>m.team==='red'),...towers.filter(q=>q.team==='red'&&q.hp>0),...camps.filter(q=>q.alive)],hero,hero.range+45);if(t){if('alive'in t){t.hp=Math.max(0,t.hp-hero.damage);if(t.hp<=0){t.alive=false;t.respawn=24;gold+=50;$('message').textContent=t.name+' defeated! +50 gold'}}else if('range'in t){t.hp=Math.max(0,t.hp-hero.damage);if(t.hp<=0){gold+=75;$('message').textContent='Enemy tower destroyed! +75 gold'}else $('message').textContent='Enemy tower hit!'}else{hit(t,hero.damage);$('message').textContent='Hit enemy!'}}else if(dist(hero,core)<hero.range+80){core.hp=Math.max(0,core.hp-hero.damage);$('message').textContent='Enemy core damaged!'}else $('message').textContent='Move closer to an enemy, tower, or jungle monster.'}
-function skill(id){if(!running)return;let rad=id==='ult'?250:id==='s2'?165:115,dmg=id==='ult'?260:id==='s2'?140:100,n=0;for(const o of [...enemies,...minions.filter(m=>m.team==='red'),...towers.filter(q=>q.team==='red'&&q.hp>0)])if(dist(hero,o)<rad){if('range'in o){o.hp=Math.max(0,o.hp-dmg);if(o.hp<=0)gold+=75}else hit(o,dmg);n++}for(const m of camps)if(m.alive&&dist(hero,m)<rad){m.hp-=dmg;if(m.hp<=0){m.alive=false;m.respawn=24;gold+=50}n++}if(dist(hero,core)<rad+35){core.hp=Math.max(0,core.hp-dmg);n++}$('message').textContent=(id==='ult'?'ULTIMATE! ':'SKILL! ')+(n?'Hit '+n+' targets':'No enemies in range')}
-function update(dt){if(!running)return;time+=dt;let mx=joy.x+(keys.ArrowRight||keys.d?1:0)-(keys.ArrowLeft||keys.a?1:0),my=joy.y+(keys.ArrowDown||keys.s?1:0)-(keys.ArrowUp||keys.w?1:0),len=Math.hypot(mx,my);if(len>1){mx/=len;my/=len}hero.x=clamp(hero.x+mx*hero.speed*dt,40,MW-40);hero.y=clamp(hero.y+my*hero.speed*dt,80,MH-80);
-for(const e of enemies){if(e.hp<=0)continue;let t=dist(e,hero)<230?hero:nearest(minions.filter(m=>m.team==='blue'),e,190);if(t){if(dist(e,t)>95){const d=dist(e,t)||1;e.x+=(t.x-e.x)/d*e.speed*dt;e.y+=(t.y-e.y)/d*e.speed*dt}else{e.cd-=dt;if(e.cd<=0){if(t===hero)hero.hp=Math.max(0,hero.hp-e.damage);else t.hp=Math.max(0,t.hp-e.damage);e.cd=1.2}}}}
+function damageTarget(o,raw,kind='skill'){
+ if(!o||o.hp<=0)return 0;
+ let mult=1;
+ // Basic attacks and skills are much less effective against objectives, as in a MOBA.
+ if('range'in o) mult=kind==='basic'?0.70:0.32; // towers
+ else if(o===core) mult=kind==='basic'?0.65:0.28; // core
+ else if('alive'in o) mult=kind==='basic'?0.62:0.72; // jungle monsters
+ const dealt=Math.max(1,Math.round(raw*mult));
+ if('alive'in o){o.hp=Math.max(0,o.hp-dealt);if(o.hp<=0){o.alive=false;o.respawn=30;gold+=50;$('message').textContent=o.name+' defeated! +50 gold';}}
+ else if('range'in o){o.hp=Math.max(0,o.hp-dealt);if(o.hp<=0){gold+=75;$('message').textContent='Enemy tower destroyed! +75 gold';}else $('message').textContent='Enemy tower hit! ('+dealt+' damage)';}
+ else if(o===core){o.hp=Math.max(0,o.hp-dealt);$('message').textContent='Enemy core hit! ('+dealt+' damage)';}
+ else {const before=o.hp;hit(o,dealt);}
+ return dealt;
+}
+function attack(){
+ if(!running||!hero||attackCd>0)return;
+ attackCd=0.52;
+ let t=nearest([...enemies,...minions.filter(m=>m.team==='red'),...towers.filter(q=>q.team==='red'&&q.hp>0),...camps.filter(q=>q.alive)],hero,hero.range+45);
+ if(t){damageTarget(t,hero.damage,'basic');if(!('range'in t)&&!('alive'in t)&&t!==core)$('message').textContent='Basic attack!';}
+ else if(dist(hero,core)<hero.range+80)damageTarget(core,hero.damage,'basic');
+ else $('message').textContent='Move closer to an enemy, tower, or jungle monster.';
+}
+function skill(id){
+ if(!running||!hero)return;
+ if(skillCds[id]>0){$('message').textContent=id.toUpperCase()+' cooling down: '+Math.ceil(skillCds[id])+'s';return;}
+ skillCds[id]=SKILL_COOLDOWNS[id];
+ const rad=id==='ult'?235:id==='s2'?155:115;
+ const dmg=id==='ult'?235:id==='s2'?125:85;
+ let n=0;
+ for(const o of [...enemies,...minions.filter(m=>m.team==='red'),...towers.filter(q=>q.team==='red'&&q.hp>0)])if(dist(hero,o)<rad){damageTarget(o,dmg,'skill');n++;}
+ for(const m of camps)if(m.alive&&dist(hero,m)<rad){damageTarget(m,dmg,'skill');n++;}
+ if(dist(hero,core)<rad+35){damageTarget(core,dmg,'skill');n++;}
+ $('message').textContent=(id==='ult'?'ULTIMATE! ':'SKILL! ')+(n?'Hit '+n+' targets · cooldown '+SKILL_COOLDOWNS[id]+'s':'No enemies in range · cooldown '+SKILL_COOLDOWNS[id]+'s');
+}
+function update(dt){if(!running)return;time+=dt;attackCd=Math.max(0,attackCd-dt);for(const k in skillCds)skillCds[k]=Math.max(0,skillCds[k]-dt);let mx=joy.x+(keys.ArrowRight||keys.d?1:0)-(keys.ArrowLeft||keys.a?1:0),my=joy.y+(keys.ArrowDown||keys.s?1:0)-(keys.ArrowUp||keys.w?1:0),len=Math.hypot(mx,my);if(len>1){mx/=len;my/=len}hero.x=clamp(hero.x+mx*hero.speed*dt,40,MW-40);hero.y=clamp(hero.y+my*hero.speed*dt,80,MH-80);
+for(const e of enemies){if(e.hp<=0)continue;let t=dist(e,hero)<230?hero:nearest(minions.filter(m=>m.team==='blue'),e,190);if(t){if(dist(e,t)>95){const d=dist(e,t)||1;e.x+=(t.x-e.x)/d*e.speed*dt;e.y+=(t.y-e.y)/d*e.speed*dt}else{e.cd-=dt;if(e.cd<=0){if(t===hero)hero.hp=Math.max(0,hero.hp-e.damage);else t.hp=Math.max(0,t.hp-e.damage);e.cd=1.35}}}}
 for(const m of minions){if(m.hp<=0)continue;let foes=m.team==='blue'?[...enemies,...minions.filter(q=>q.team==='red')]:[hero,...minions.filter(q=>q.team==='blue')];let t=nearest(foes,m,90);if(t){m.cd-=dt;if(m.cd<=0){hit(t,m.damage);m.cd=1.1}}else m.x+=(m.team==='blue'?1:-1)*m.speed*dt}
 // Defensive towers automatically fire at nearby opposing heroes, minions, and enemy units.
 for(const tw of towers){if(tw.hp<=0)continue;const foes=tw.team==='blue'?[hero,...enemies,...minions.filter(m=>m.team==='red')]:[hero,...minions.filter(m=>m.team==='blue')];const target=nearest(foes.filter(o=>o!==hero||tw.team==='red'),tw,tw.range);if(target){tw.cd-=dt;if(tw.cd<=0){target.hp=Math.max(0,target.hp-tw.damage);tw.cd=1.35;shots.push({x:tw.x,y:tw.y,tx:target.x,ty:target.y,team:tw.team,life:.18})}}}
 // Jungle monsters wake when the hero comes close, chase, strike, then respawn after defeat.
-for(const m of camps){if(!m.alive){m.respawn-=dt;if(m.respawn<=0){m.alive=true;m.hp=m.maxHp}continue}if(dist(m,hero)<150){const d=dist(m,hero)||1;if(d>48){m.x+=(hero.x-m.x)/d*35*dt;m.y+=(hero.y-m.y)/d*35*dt}else{m.cd-=dt;if(m.cd<=0){hero.hp=Math.max(0,hero.hp-m.damage);m.cd=1.25}}}}
+for(const m of camps){if(!m.alive){m.respawn-=dt;if(m.respawn<=0){m.alive=true;m.hp=m.maxHp}continue}if(dist(m,hero)<150){const d=dist(m,hero)||1;if(d>48){m.x+=(hero.x-m.x)/d*35*dt;m.y+=(hero.y-m.y)/d*35*dt}else{m.cd-=dt;if(m.cd<=0){hero.hp=Math.max(0,hero.hp-m.damage);m.cd=1.45}}}}
 for(const sh of shots){sh.life-=dt}shots=shots.filter(sh=>sh.life>0);
-enemies=enemies.filter(o=>o.hp>0);minions=minions.filter(o=>o.hp>0);if(core.hp<=0){running=false;$('message').textContent='VICTORY! Enemy core destroyed — tap Enter the Arena to play again.';$('start').style.display='flex';$('play').textContent='PLAY AGAIN'}
+enemies=enemies.filter(o=>o.hp>0);minions=minions.filter(o=>o.hp>0);if(core.hp<=0){running=false;$('message').textContent='VICTORY! Enemy core destroyed — tap Enter the Arena to play again.';$('start').style.display='flex';$('play').textContent='PLAY AGAIN'}else if(hero.hp<=0){hero.hp=0;running=false;$('message').textContent='DEFEAT! Your hero was defeated — tap Enter the Arena to try again.';$('start').style.display='flex';$('play').textContent='TRY AGAIN'}
 $('hpFill').style.width=(hero.hp/hero.maxHp*100)+'%';$('heroName').textContent=gods[chosen].name;$('stats').textContent=`HP ${Math.ceil(hero.hp)} / ${hero.maxHp} · LV ${hero.level}`;$('coreText').textContent='CORE '+Math.ceil(core.hp/core.maxHp*100)+'%';$('score').textContent=`KOs ${kos} · Gold ${gold}`}
 function circle(x,y,r,fill,stroke){ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=3;ctx.stroke()}}
 function project(x,y){return {x:500+(x-y)*0.5,y:28+(x+y)*0.32}}
@@ -83,6 +118,13 @@ ctx.save();ctx.transform(.5,.32,-.5,.32,500,28);ctx.fillStyle='#397d49';ctx.fill
 for(let y=0;y<MH;y+=60)for(let x=0;x<MW;x+=60){ctx.fillStyle=((x/60+y/60)%2)?'#347648':'#3b824c';ctx.fillRect(x,y,60,60);ctx.strokeStyle='#5b985333';ctx.lineWidth=1;ctx.strokeRect(x+1,y+1,58,58);if(((x*7+y*3)%4)===0){ctx.fillStyle='#72a75a55';ctx.beginPath();ctx.ellipse(x+18,y+20,12,5,-.4,0,Math.PI*2);ctx.fill()}}
 // Raised green ridges along the outer jungle make the world feel layered instead of flat.
 for(const [x,y,w,h] of [[90,95,150,58],[310,78,115,44],[540,85,150,48],[960,85,145,48],[1190,78,130,50],[1400,110,135,56],[100,900,150,55],[330,920,145,45],[550,905,125,42],[960,910,145,45],[1190,920,140,52],[1400,900,130,55]])drawCliff(x,y,w,h);
+// Isometric jungle ledges: layered faces and top planes add stronger 2.5D depth.
+function drawLedge(x,y,w,h,shade=0){
+ const lift=18;ctx.fillStyle='#183d2b';ctx.beginPath();ctx.moveTo(x-w/2,y-h/2);ctx.lineTo(x+w/2,y-h/2);ctx.lineTo(x+w/2,y+h/2);ctx.lineTo(x-w/2,y+h/2);ctx.closePath();ctx.fill();
+ ctx.fillStyle=shade?'#496f48':'#557b4b';ctx.beginPath();ctx.moveTo(x-w/2,y-h/2);ctx.lineTo(x,y-h/2-lift);ctx.lineTo(x+w/2,y-h/2);ctx.lineTo(x+w/2,y+h/2);ctx.lineTo(x,y+h/2+lift*.45);ctx.lineTo(x-w/2,y+h/2);ctx.closePath();ctx.fill();
+ ctx.strokeStyle='#8eaa70';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x-w/2,y-h/2);ctx.lineTo(x,y-h/2-lift);ctx.lineTo(x+w/2,y-h/2);ctx.stroke();
+}
+for(const [x,y,w,h,s] of [[175,300,100,42,0],[1325,300,110,45,1],[170,700,105,42,1],[1330,700,110,44,0],[520,125,90,34,0],[980,875,95,36,1]])drawLedge(x,y,w,h,s);
 // Small rock formations and broken stonework at jungle edges.
 for(const [x,y,z] of [[95,210,1.1],[330,225,.8],[520,150,.75],[980,160,.8],[1170,230,1],[1400,230,.9],[100,780,.9],[350,790,1],[520,850,.8],[980,845,.8],[1180,775,1],[1400,790,.9],[640,390,.65],[860,610,.7]])drawRock(x,y,z);
 // Jungle clearing patches
@@ -124,10 +166,10 @@ ctx.restore();
 // Draw 3D-like defensive towers above their stone pads.
 for(const tw of towers){if(tw.hp<=0)continue;const p=project(tw.x,tw.y),blue=tw.team==='blue',col=blue?'#36a9e8':'#e34d67';ctx.fillStyle='#18291f88';ctx.beginPath();ctx.ellipse(p.x,p.y+12,25,13,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#686e67';ctx.beginPath();ctx.moveTo(p.x-21,p.y+4);ctx.lineTo(p.x-15,p.y-17);ctx.lineTo(p.x+15,p.y-17);ctx.lineTo(p.x+21,p.y+4);ctx.closePath();ctx.fill();ctx.fillStyle=col;ctx.beginPath();ctx.moveTo(p.x-14,p.y-15);ctx.lineTo(p.x-9,p.y-39);ctx.lineTo(p.x+9,p.y-39);ctx.lineTo(p.x+14,p.y-15);ctx.closePath();ctx.fill();ctx.fillStyle='#f4e5bb';ctx.fillRect(p.x-4,p.y-35,8,12);ctx.fillStyle='#18201d';ctx.fillRect(p.x-22,p.y-49,44,5);ctx.fillStyle=blue?'#62e4ff':'#ff667b';ctx.fillRect(p.x-22,p.y-49,44*Math.max(0,tw.hp/tw.maxHp),5);ctx.fillStyle=col;ctx.beginPath();ctx.arc(p.x,p.y-42,6,0,Math.PI*2);ctx.fill()}
 for(const sh of shots){const a=project(sh.x,sh.y),b=project(sh.tx,sh.ty);ctx.strokeStyle=sh.team==='blue'?'#66eaff':'#ff6a83';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(a.x,a.y-24);ctx.lineTo(b.x,b.y-8);ctx.stroke()}
-// Stylized ML-inspired jungle monsters: layered body volumes, rim lighting, animated limbs and contact shadows. 
- function drawMonster(m){
+// Stylized ML-inspired jungle monsters: layered body volumes, rim lighting, animated limbs and contact shadows.
+function drawMonster(m){
  const p=project(m.x,m.y),x=p.x,y=p.y,phase=time*4+(m.x+m.y)*.013;
- const scale=m.name.includes('Sentinel')?1.28:m.name.includes('Brute')?1.16:1.08;
+ const scale=m.name.includes('Sentinel')?0.88:m.name.includes('Brute')?0.78:0.70;
  const bob=Math.sin(phase)*2.2,step=Math.sin(phase*1.7)*4;
  const base=m.color||'#aab5aa';
  const dark=m.name.includes('Ember')?'#773a2c':m.name.includes('Void')?'#432b70':m.name.includes('Sentinel')?'#174e66':'#38443e';
@@ -190,4 +232,3 @@ joyEl.addEventListener('pointerdown',e=>{drag=true;joyEl.setPointerCapture(e.poi
 requestAnimationFrame(loop);
 })();
 </script></body></html>
- 
