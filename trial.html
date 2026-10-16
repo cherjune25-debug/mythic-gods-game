@@ -3,52 +3,53 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>Mythic Anime MOBA: 3-Lane 2.5D Arena</title>
+<title>Mythic Anime MOBA: Ultra 2.5D Arena</title>
 <style>
 *{box-sizing:border-box}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#0d1821;color:#fff;font-family:system-ui,-apple-system,BlinkMacSystemFont,Arial;touch-action:none}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#090e17;color:#fff;font-family:system-ui,-apple-system,BlinkMacSystemFont,Arial;touch-action:none}
 canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 #hud{position:absolute;inset:0;pointer-events:none}
-.panel{background:#0e1724eb;border:1px solid #ffffff33;border-radius:10px;padding:6px 10px;box-shadow:0 4px 15px #0008}
+.panel{background:#0d1522f0;border:1px solid #ffffff2a;border-radius:12px;padding:6px 12px;box-shadow:0 4px 18px #000a}
 
 /* Top Bar & Mini-Map */
-#top{position:absolute;top:8px;left:8px;right:8px;display:flex;justify-content:space-between;align-items:flex-start;gap:6px;font-size:11px}
-#heroInfo{min-width:140px;max-width:210px}
-#heroName{font-size:12px;font-weight:900;color:#ffdc78}
-.bar{height:7px;background:#4a1e28;border-radius:6px;overflow:hidden;margin:3px 0}
-#hpFill{height:100%;background:#48e58a;width:100%}
-#mpFill{height:100%;background:#4ba3ff;width:100%}
+#top{position:absolute;top:10px;left:10px;right:10px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+#heroInfo{min-width:145px;max-width:220px}
+#heroName{font-size:12px;font-weight:900;color:#f6e58d;letter-spacing:0.5px}
+.bar{height:7px;background:#3b1720;border-radius:6px;overflow:hidden;margin:3px 0}
+#hpFill{height:100%;background:linear-gradient(90deg,#2ed573,#7bed9f);width:100%}
+#mpFill{height:100%;background:linear-gradient(90deg,#1e90ff,#70a1ff);width:100%}
 #objective{text-align:center;font-size:10px}
-#coreText{color:#ff687a;font-weight:900;font-size:12px}
+#coreText{color:#ff4757;font-weight:900;font-size:12px}
 
 /* Mini-Map Radar */
-#minimap-wrap{position:relative;width:105px;height:80px;background:#09121be6;border:2px solid #ffffff44;border-radius:8px;overflow:hidden;box-shadow:0 3px 10px #0009}
+#minimap-wrap{position:relative;width:110px;height:84px;background:#0a101ae8;border:2px solid #ffffff33;border-radius:10px;overflow:hidden;box-shadow:0 4px 12px #000c}
 #minimap{width:100%;height:100%;display:block}
 
-#message{position:absolute;top:90px;left:50%;transform:translateX(-50%);font-size:11px;background:#101a2bee;padding:6px 14px;border-radius:20px;border:1px solid #ffdc7855;max-width:92%;text-align:center;color:#ffeaa7}
+#message{position:absolute;top:94px;left:50%;transform:translateX(-50%);font-size:11px;background:#0e1724f2;padding:6px 16px;border-radius:20px;border:1px solid #f6e58d55;max-width:92%;text-align:center;color:#ffeaa7}
 
 /* Bottom Controls */
-#controls{position:absolute;bottom:12px;left:12px;right:12px;display:flex;justify-content:space-between;align-items:flex-end;pointer-events:none}
-#joy{width:120px;height:120px;border:2px solid #ffffff66;background:#101b2a99;border-radius:50%;position:relative;pointer-events:auto;touch-action:none}
-#stick{position:absolute;width:46px;height:46px;left:37px;top:37px;border-radius:50%;background:radial-gradient(circle,#91baff,#406ea8);border:2px solid #fff;box-shadow:0 0 10px #6ba3ff99;pointer-events:none}
+#controls{position:absolute;bottom:14px;left:14px;right:14px;display:flex;justify-content:space-between;align-items:flex-end;pointer-events:none}
+#joy{width:124px;height:124px;border:2px solid #ffffff55;background:#0f1a2cf0;border-radius:50%;position:relative;pointer-events:auto;touch-action:none;box-shadow:0 0 20px #000a}
+#stick{position:absolute;width:48px;height:48px;left:38px;top:38px;border-radius:50%;background:radial-gradient(circle,#70a1ff,#1e90ff);border:2px solid #fff;box-shadow:0 0 14px #1e90ffa0;pointer-events:none}
 
-#buttons{display:grid;grid-template-columns:repeat(2,64px);gap:10px;pointer-events:auto}
-.action{width:64px;height:64px;border-radius:50%;border:2px solid #ffffff88;background:#1a283eee;color:white;font-weight:900;font-size:10px;touch-action:none;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;cursor:pointer}
-.action span.ico{font-size:16px;margin-bottom:2px}
-.cd-overlay{position:absolute;bottom:0;left:0;right:0;height:0%;background:rgba(0,0,0,0.7);pointer-events:none}
-#attack{background:radial-gradient(circle,#c0392b,#78281f);border-color:#ff7675}
-#ult{background:radial-gradient(circle,#8e44ad,#512e5f);border-color:#d7bde2}
+#buttons{display:grid;grid-template-columns:repeat(2,66px);gap:10px;pointer-events:auto}
+.action{width:66px;height:66px;border-radius:50%;border:2px solid #ffffff77;background:#152238fa;color:white;font-weight:900;font-size:10px;touch-action:none;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;cursor:pointer;box-shadow:0 4px 12px #0008}
+.action span.ico{font-size:17px;margin-bottom:2px}
+.cd-overlay{position:absolute;bottom:0;left:0;right:0;height:0%;background:rgba(0,0,0,0.75);pointer-events:none}
+#attack{background:radial-gradient(circle,#eb4d4b,#c0392b);border-color:#ff7979}
+#ult{background:radial-gradient(circle,#9b59b6,#6c5ce7);border-color:#e056fd}
 
 /* Hero Selection Screen */
-#start{position:absolute;inset:0;background:#050c18fa;display:flex;align-items:center;justify-content:center;padding:16px;z-index:100}
-.card{width:min(440px,100%);background:#101b2df5;border:1px solid #ffdc7855;border-radius:18px;padding:22px;text-align:center;box-shadow:0 0 25px #000}
-.logo{font-size:clamp(24px,6vw,36px);font-weight:1000;color:#ffdc78;letter-spacing:1px}
-.heroes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
-.hero-card{padding:10px 4px;border-radius:12px;border:1px solid #ffffff33;background:#18253a;color:white;cursor:pointer}
-.hero-card.sel{border:2px solid #ffdc78;background:#38321e}
-.hero-card strong{font-size:12px;display:block}
-.hero-card small{font-size:10px;color:#cbd5e1}
-#play{width:100%;padding:13px;border:0;border-radius:12px;background:linear-gradient(#ffe48a,#e7a82e);font-weight:1000;font-size:15px;margin-top:16px;cursor:pointer;color:#1a1405}
+#start{position:absolute;inset:0;background:#040912fa;display:flex;align-items:center;justify-content:center;padding:16px;z-index:100}
+.card{width:min(440px,100%);background:#0c1524f7;border:1px solid #f6e58d55;border-radius:20px;padding:24px;text-align:center;box-shadow:0 0 35px #000}
+.logo{font-size:clamp(24px,6vw,38px);font-weight:1000;color:#f6e58d;letter-spacing:1px}
+.heroes{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
+.hero-card{padding:12px 6px;border-radius:14px;border:1px solid #ffffff2a;background:#121e33;color:white;cursor:pointer;transition:transform 0.15s}
+.hero-card:active{transform:scale(0.96)}
+.hero-card.sel{border:2px solid #f6e58d;background:#2d2919;box-shadow:0 0 15px #f6e58d44}
+.hero-card strong{font-size:13px;display:block;margin-top:4px}
+.hero-card small{font-size:10px;color:#94a3b8}
+#play{width:100%;padding:14px;border:0;border-radius:14px;background:linear-gradient(#f6e58d,#f0932b);font-weight:1000;font-size:16px;margin-top:18px;cursor:pointer;color:#181204;box-shadow:0 4px 15px #f0932b66}
 </style>
 </head>
 <body>
@@ -59,12 +60,12 @@ canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
     <div id="heroInfo" class="panel">
       <div id="heroName">RYU · SHADOW BLADE</div>
       <div class="bar"><div id="hpFill"></div></div>
-      <div class="bar" style="background:#1a2838;"><div id="mpFill"></div></div>
-      <div id="stats" style="font-size:10px;color:#a0aec0;">HP 1000 · LV 1</div>
+      <div class="bar" style="background:#131c2b;"><div id="mpFill"></div></div>
+      <div id="stats" style="font-size:10px;color:#94a3b8;">HP 1200 · LV 1</div>
     </div>
     
     <div id="objective" class="panel">
-      DESTROY ENEMY CORE<br>
+      DESTROY RED CORE<br>
       <span id="coreText">CORE 100%</span>
     </div>
 
@@ -74,7 +75,7 @@ canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
     </div>
   </div>
 
-  <div id="message">Choose an anime champion and enter the 3-lane battlefield!</div>
+  <div id="message">Choose an anime champion and conquer the 3-lane battlefield!</div>
 
   <div id="controls">
     <div id="joy"><div id="stick"></div></div>
@@ -90,22 +91,22 @@ canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 <!-- Selection Modal -->
 <div id="start">
   <div class="card">
-    <div class="logo">ANIME GODS MOBA</div>
-    <p style="font-size:12px;color:#94a3b8;margin:4px 0 14px 0;">3-LANE 2.5D ARENA · MOBILE LEGENDS STYLE</p>
+    <div class="logo">MYTHIC MOBA 2.5D</div>
+    <p style="font-size:12px;color:#94a3b8;margin:4px 0 14px 0;">3-LANE REALISTIC ARENA · ANIME CHAMPIONS</p>
     <b>SELECT YOUR CHAMPION</b>
     <div class="heroes">
       <div class="hero-card sel" data-hero="ryu">
-        <span style="font-size:22px;">⚔️</span>
+        <span style="font-size:26px;">⚔️</span>
         <strong>RYU</strong>
         <small>Shadow Blade<br>(Assassin)</small>
       </div>
       <div class="hero-card" data-hero="gojo">
-        <span style="font-size:22px;">🔮</span>
+        <span style="font-size:26px;">🔮</span>
         <strong>SATORU</strong>
         <small>Void Sorcerer<br>(Mage)</small>
       </div>
       <div class="hero-card" data-hero="raiden">
-        <span style="font-size:22px;">⚡</span>
+        <span style="font-size:26px;">⚡</span>
         <strong>RAIDEN</strong>
         <small>Thunder God<br>(Fighter)</small>
       </div>
@@ -117,7 +118,7 @@ canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 <script>
 (()=>{
 /* ==========================================================================
-   WEB AUDIO API
+   WEB AUDIO API SOUND GENERATOR
    ========================================================================== */
 const actx=new(window.AudioContext||window.webkitAudioContext)();
 function playSfx(type){
@@ -125,33 +126,33 @@ function playSfx(type){
   const osc=actx.createOscillator(),gain=actx.createGain(),t=actx.currentTime;
   osc.connect(gain);gain.connect(actx.destination);
   if(type==='slash'){
-    osc.type='sawtooth';osc.frequency.setValueAtTime(450,t);osc.frequency.exponentialRampToValueAtTime(80,t+0.12);
-    gain.gain.setValueAtTime(0.25,t);gain.gain.linearRampToValueAtTime(0.01,t+0.12);
+    osc.type='sawtooth';osc.frequency.setValueAtTime(520,t);osc.frequency.exponentialRampToValueAtTime(80,t+0.12);
+    gain.gain.setValueAtTime(0.3,t);gain.gain.linearRampToValueAtTime(0.01,t+0.12);
     osc.start(t);osc.stop(t+0.12);
   }else if(type==='beam'){
-    osc.type='square';osc.frequency.setValueAtTime(800,t);osc.frequency.exponentialRampToValueAtTime(140,t+0.35);
-    gain.gain.setValueAtTime(0.2,t);gain.gain.linearRampToValueAtTime(0.01,t+0.35);
+    osc.type='square';osc.frequency.setValueAtTime(880,t);osc.frequency.exponentialRampToValueAtTime(140,t+0.35);
+    gain.gain.setValueAtTime(0.25,t);gain.gain.linearRampToValueAtTime(0.01,t+0.35);
     osc.start(t);osc.stop(t+0.35);
   }else if(type==='thunder'){
-    osc.type='triangle';osc.frequency.setValueAtTime(120,t);osc.frequency.exponentialRampToValueAtTime(30,t+0.4);
-    gain.gain.setValueAtTime(0.4,t);gain.gain.linearRampToValueAtTime(0.01,t+0.4);
-    osc.start(t);osc.stop(t+0.4);
+    osc.type='triangle';osc.frequency.setValueAtTime(140,t);osc.frequency.exponentialRampToValueAtTime(30,t+0.45);
+    gain.gain.setValueAtTime(0.45,t);gain.gain.linearRampToValueAtTime(0.01,t+0.45);
+    osc.start(t);osc.stop(t+0.45);
   }else if(type==='dash'){
-    osc.type='sine';osc.frequency.setValueAtTime(600,t);osc.frequency.exponentialRampToValueAtTime(300,t+0.1);
-    gain.gain.setValueAtTime(0.15,t);gain.gain.linearRampToValueAtTime(0.01,t+0.1);
+    osc.type='sine';osc.frequency.setValueAtTime(650,t);osc.frequency.exponentialRampToValueAtTime(280,t+0.1);
+    gain.gain.setValueAtTime(0.2,t);gain.gain.linearRampToValueAtTime(0.01,t+0.1);
     osc.start(t);osc.stop(t+0.1);
   }
 }
 
 /* ==========================================================================
-   GAME ENGINE & VARIABLES
+   GAME ENGINE & CONSTANTS
    ========================================================================== */
 const c=document.getElementById('game'),ctx=c.getContext('2d');
 const mm=document.getElementById('minimap'),mmCtx=mm.getContext('2d');
-let W=0,H=0,dpr=1,running=false,chosen='ryu',last=0;
-const MW=2000,MH=1400;
+let W=0,H=0,dpr=1,running=false,chosen='ryu',last=0,time=0;
+const MW=2200,MH=1500;
 
-// CONTROLLER STATE: Correctly declared with LET so they can be modified!
+// CONTROLLER VARIABLES
 let joy={x:0,y:0};
 let drag=false;
 let keys={};
@@ -160,12 +161,12 @@ let hero=null,core=null,towers=[],minions=[],enemies=[],camps=[],shots=[],partic
 let attackCd=0,skillCds={s1:0,s2:0,ult:0},waveTimer=0,shake=0;
 
 const HEROES={
-  ryu:{name:'RYU · SHADOW BLADE',glyph:'⚔',color:'#50e3c2',hp:1100,mp:600,damage:78,speed:215,range:75,
-       s1:{name:'Wind Cutter',cd:3.5,range:260,dmg:150},s2:{name:'Flash Step',cd:6.0,range:220,dmg:120},ult:{name:'Omnislash',cd:18,range:300,dmg:440}},
-  gojo:{name:'SATORU · VOID MAGE',glyph:'🔮',color:'#a29bfe',hp:980,mp:900,damage:70,speed:195,range:180,
-       s1:{name:'Blue Vortex',cd:4.0,range:280,dmg:160},s2:{name:'Reversal Red',cd:7.0,range:180,dmg:140},ult:{name:'Hollow Purple',cd:20,range:450,dmg:480}},
-  raiden:{name:'RAIDEN · THUNDER GOD',glyph:'⚡',color:'#f1c40f',hp:1250,mp:700,damage:84,speed:200,range:85,
-       s1:{name:'Lightning Shuriken',cd:3.8,range:250,dmg:145},s2:{name:'Chidori Rush',cd:6.5,range:200,dmg:130},ult:{name:'Kirin Storm',cd:22,range:380,dmg:460}}
+  ryu:{name:'RYU · SHADOW BLADE',glyph:'⚔',color:'#2ed573',hp:1200,mp:650,damage:88,speed:225,range:75,
+       s1:{name:'Wind Cutter',cd:3.5,range:280,dmg:165},s2:{name:'Flash Step',cd:5.5,range:230,dmg:135},ult:{name:'Omnislash',cd:18,range:320,dmg:480}},
+  gojo:{name:'SATORU · VOID MAGE',glyph:'🔮',color:'#a55eea',hp:1050,mp:950,damage:76,speed:205,range:185,
+       s1:{name:'Blue Vortex',cd:4.0,range:290,dmg:175},s2:{name:'Reversal Red',cd:6.5,range:190,dmg:150},ult:{name:'Hollow Purple',cd:20,range:480,dmg:520}},
+  raiden:{name:'RAIDEN · THUNDER GOD',glyph:'⚡',color:'#f1c40f',hp:1350,mp:750,damage:92,speed:210,range:85,
+       s1:{name:'Lightning Shuriken',cd:3.8,range:260,dmg:155},s2:{name:'Chidori Rush',cd:6.0,range:210,dmg:140},ult:{name:'Kirin Storm',cd:22,range:400,dmg:510}}
 };
 
 function resize(){
@@ -173,12 +174,12 @@ function resize(){
   W=innerWidth;H=innerHeight;
   c.width=Math.round(W*dpr);c.height=Math.round(H*dpr);
   c.style.width=W+'px';c.style.height=H+'px';
-  mm.width=105;mm.height=80;
+  mm.width=110;mm.height=84;
 }
 addEventListener('resize',resize);resize();
 
 function project(x,y){
-  return {x:550+(x-y)*0.65, y:40+(x+y)*0.32};
+  return {x:580+(x-y)*0.65, y:45+(x+y)*0.32};
 }
 const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -188,47 +189,51 @@ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
    ========================================================================== */
 function resetGame(){
   const h=HEROES[chosen];
-  hero={x:180,y:700,r:22,hp:h.hp,maxHp:h.hp,mp:h.mp,maxMp:h.mp,damage:h.damage,speed:h.speed,range:h.range,color:h.color,glyph:h.glyph,inBush:false};
-  core={x:1820,y:700,hp:4500,maxHp:4500,team:'red',r:40};
+  hero={x:200,y:750,r:22,hp:h.hp,maxHp:h.hp,mp:h.mp,maxMp:h.mp,damage:h.damage,speed:h.speed,range:h.range,color:h.color,glyph:h.glyph,angle:0,walk:0,inBush:false};
+  core={x:2000,y:750,hp:5000,maxHp:5000,team:'red',r:44};
   
   towers=[];minions=[];enemies=[];camps=[];shots=[];particles=[];floats=[];
-  attackCd=0;skillCds={s1:0,s2:0,ult:0};waveTimer=0;
+  attackCd=0;skillCds={s1:0,s2:0,ult:0};waveTimer=0;time=0;
 
+  // Realistic Tower Positions (Top, Mid, Bot)
   // Top Lane Towers
-  towers.push({team:'blue',lane:'top',x:380,y:250,hp:2200,maxHp:2200,range:180,damage:80,cd:0});
-  towers.push({team:'blue',lane:'top',x:850,y:250,hp:2200,maxHp:2200,range:180,damage:80,cd:0});
-  towers.push({team:'red',lane:'top',x:1200,y:250,hp:2200,maxHp:2200,range:180,damage:80,cd:0});
-  towers.push({team:'red',lane:'top',x:1620,y:250,hp:2200,maxHp:2200,range:180,damage:80,cd:0});
+  towers.push({team:'blue',lane:'top',x:420,y:260,hp:2400,maxHp:2400,range:190,damage:85,cd:0});
+  towers.push({team:'blue',lane:'top',x:950,y:260,hp:2400,maxHp:2400,range:190,damage:85,cd:0});
+  towers.push({team:'red',lane:'top',x:1350,y:260,hp:2400,maxHp:2400,range:190,damage:85,cd:0});
+  towers.push({team:'red',lane:'top',x:1780,y:260,hp:2400,maxHp:2400,range:190,damage:85,cd:0});
 
   // Mid Lane Towers
-  towers.push({team:'blue',lane:'mid',x:450,y:700,hp:2200,maxHp:2200,range:180,damage:80,cd:0});
-  towers.push({team:'blue',lane:'mid',x:850,y:700,hp:2200,maxHp:2200,range:180,damage:80,cd:0});
-  towers.push({team:'red',lane:'mid',x:1150,y:700,hp:2200,maxHp:2200,range:180,damage:80,cd:0});
-  towers.push({team:'red',lane:'mid',x:1550,y:700,hp:2200,maxHp:2200,range:180,damage:80,cd:0});
+  towers.push({team:'blue',lane:'mid',x:500,y:750,hp:2400,maxHp:2400,range:190,damage:85,cd:0});
+  towers.push({team:'blue',lane:'mid',x:920,y:750,hp:2400,maxHp:2400,range:190,damage:85,cd:0});
+  towers.push({team:'red',lane:'mid',x:1280,y:750,hp:2400,maxHp:2400,range:190,damage:85,cd:0});
+  towers.push({team:'red',lane:'mid',x:1700,y:750,hp:2400,maxHp:2400,range:190,damage:85,cd:0});
 
   // Bot Lane Towers
-  towers.push({team:'blue',lane:'bot',x:380,y:1150,hp:2200,maxHp:2200,range:180,damage:80,cd:0});
-  towers.push({team:'blue',lane:'bot',x:850,y:1150,hp:2200,maxHp:2200,range:180,damage:80,cd:0});
-  towers.push({team:'red',lane:'bot',x:1200,y:1150,hp:2200,maxHp:2200,range:180,damage:80,cd:0});
-  towers.push({team:'red',lane:'bot',x:1620,y:1150,hp:2200,maxHp:2200,range:180,damage:80,cd:0});
+  towers.push({team:'blue',lane:'bot',x:420,y:1240,hp:2400,maxHp:2400,range:190,damage:85,cd:0});
+  towers.push({team:'blue',lane:'bot',x:950,y:1240,hp:2400,maxHp:2400,range:190,damage:85,cd:0});
+  towers.push({team:'red',lane:'bot',x:1350,y:1240,hp:2400,maxHp:2400,range:190,damage:85,cd:0});
+  towers.push({team:'red',lane:'bot',x:1780,y:1240,hp:2400,maxHp:2400,range:190,damage:85,cd:0});
 
+  // Jungle Monster Camps
   camps=[
-    {x:600,y:450,name:'Blue Golem',color:'#3498db',hp:950,maxHp:950,r:24,damage:30,cd:1,alive:true,respawn:0},
-    {x:1400,y:450,name:'Red Beast',color:'#e74c3c',hp:950,maxHp:950,r:24,damage:30,cd:1,alive:true,respawn:0},
-    {x:600,y:950,name:'Stone Brute',color:'#95a5a6',hp:900,maxHp:900,r:24,damage:28,cd:1,alive:true,respawn:0},
-    {x:1400,y:950,name:'Void Fiend',color:'#9b59b6',hp:900,maxHp:900,r:24,damage:28,cd:1,alive:true,respawn:0},
-    {x:1000,y:700,name:'Lord Pit',color:'#f39c12',hp:2500,maxHp:2500,r:32,damage:55,cd:1,alive:true,respawn:0}
+    {x:680,y:480,name:'Blue Buff Golem',color:'#1e90ff',hp:1100,maxHp:1100,r:26,damage:32,cd:1,alive:true,respawn:0,type:'golem'},
+    {x:1520,y:480,name:'Red Horned Beast',color:'#eb4d4b',hp:1100,maxHp:1100,r:26,damage:32,cd:1,alive:true,respawn:0,type:'beast'},
+    {x:680,y:1020,name:'Stone Sentinel',color:'#a4b0be',hp:1000,maxHp:1000,r:24,damage:28,cd:1,alive:true,respawn:0,type:'stone'},
+    {x:1520,y:1020,name:'Void Stalker',color:'#6c5ce7',hp:1000,maxHp:1000,r:24,damage:28,cd:1,alive:true,respawn:0,type:'void'},
+    {x:1100,y:750,name:'Lord Titan',color:'#f1c40f',hp:3200,maxHp:3200,r:36,damage:65,cd:1,alive:true,respawn:0,type:'lord'}
   ];
 
+  // Bush Stealth Zones
   bushes=[
-    {x:720,y:250,r:45},{x:1280,y:250,r:45},
-    {x:720,y:700,r:45},{x:1280,y:700,r:45},
-    {x:720,y:1150,r:45},{x:1280,y:1150,r:45},
-    {x:1000,y:520,r:50},{x:1000,y:880,r:50}
+    {x:780,y:260,r:48},{x:1420,y:260,r:48},
+    {x:780,y:750,r:48},{x:1420,y:750,r:48},
+    {x:780,y:1240,r:48},{x:1420,y:1240,r:48},
+    {x:1100,y:550,r:54},{x:1100,y:950,r:54}
   ];
 
-  enemies.push({team:'red',name:'Shadow Bot',x:1250,y:700,r:20,hp:1100,maxHp:1100,damage:50,speed:175,color:'#ff6b81',cd:1});
-  enemies.push({team:'red',name:'Anime Rival',x:1300,y:250,r:20,hp:1050,maxHp:1050,damage:48,speed:180,color:'#ff4757',cd:1});
+  // Enemy AI Champions
+  enemies.push({team:'red',name:'Shadow Striker',x:1400,y:750,r:22,hp:1250,maxHp:1250,damage:54,speed:185,color:'#ff4757',angle:Math.PI,walk:0,cd:1});
+  enemies.push({team:'red',name:'Void Rival',x:1450,y:260,r:22,hp:1150,maxHp:1150,damage:50,speed:190,color:'#ff6b81',angle:Math.PI,walk:0,cd:1});
 
   running=true;
   document.getElementById('start').style.display='none';
@@ -238,25 +243,30 @@ function resetGame(){
 function spawnMinionWave(){
   const lanes=['top','mid','bot'];
   for(const lane of lanes){
-    let y=lane==='top'?250:lane==='mid'?700:1150;
-    minions.push({team:'blue',lane,x:220,y,hp:300,maxHp:300,r:12,damage:25,speed:55,cd:1,color:'#54a0ff'});
-    minions.push({team:'red',lane,x:1780,y,hp:300,maxHp:300,r:12,damage:25,speed:55,cd:1,color:'#ff6b6b'});
+    let y=lane==='top'?260:lane==='mid'?750:1240;
+    // Blue Team: 1 Melee Swordsman + 1 Ranged Caster
+    minions.push({team:'blue',lane,type:'melee',x:240,y:y-12,hp:350,maxHp:350,r:14,damage:28,speed:58,cd:1,color:'#3742fa',walk:0});
+    minions.push({team:'blue',lane,type:'ranged',x:200,y:y+12,hp:260,maxHp:260,r:13,damage:36,speed:58,cd:1,color:'#2ed573',walk:0});
+
+    // Red Team: 1 Melee Swordsman + 1 Ranged Caster
+    minions.push({team:'red',lane,type:'melee',x:1960,y:y-12,hp:350,maxHp:350,r:14,damage:28,speed:58,cd:1,color:'#eb4d4b',walk:0});
+    minions.push({team:'red',lane,type:'ranged',x:2000,y:y+12,hp:260,maxHp:260,r:13,damage:36,speed:58,cd:1,color:'#ff6b81',walk:0});
   }
 }
 
 function spawnFloatingText(x,y,text,color='#fff'){
-  floats.push({x,y,text,color,life:0.9,vy:-30});
+  floats.push({x,y,text,color,life:0.9,vy:-32});
 }
 
 function basicAttack(){
   if(!running||!hero||attackCd>0)return;
-  attackCd=0.45;
+  attackCd=0.42;
   playSfx('slash');
 
   const pool=[...enemies,...minions.filter(m=>m.team==='red'),...towers.filter(t=>t.team==='red'&&t.hp>0),...camps.filter(c=>c.alive)];
   if(core&&core.hp>0)pool.push(core);
 
-  let target=null,minD=hero.range+40;
+  let target=null,minD=hero.range+45;
   for(const e of pool){
     const d=dist(hero,e);
     if(d<minD){minD=d;target=e;}
@@ -266,7 +276,7 @@ function basicAttack(){
     const dmg=hero.damage;
     target.hp=Math.max(0,target.hp-dmg);
     spawnFloatingText(target.x,target.y,dmg,hero.color);
-    createParticles(target.x,target.y,6,hero.color);
+    createParticles(target.x,target.y,8,hero.color);
   }
 }
 
@@ -284,63 +294,65 @@ function castSkill(id){
     if(id==='s1'){
       playSfx('slash');
       for(let i=-1;i<=1;i++){
-        shots.push({x:hero.x,y:hero.y,vx:Math.cos(i*0.25)*450,vy:Math.sin(i*0.25)*450,dmg:sk.dmg,team:'blue',life:0.55,color:'#50e3c2',r:14});
+        const a=hero.angle+i*0.25;
+        shots.push({x:hero.x,y:hero.y,vx:Math.cos(a)*480,vy:Math.sin(a)*480,dmg:sk.dmg,team:'blue',life:0.55,color:'#2ed573',r:15});
       }
     }else if(id==='s2'){
       playSfx('dash');
-      hero.x=clamp(hero.x+(joy.x||1)*180,80,MW-80);
-      hero.y=clamp(hero.y+(joy.y||0)*180,80,MH-80);
-      shake=8;
-      createParticles(hero.x,hero.y,25,'#50e3c2');
-      hitEnemiesInArea(hero.x,hero.y,130,sk.dmg);
+      hero.x=clamp(hero.x+Math.cos(hero.angle)*210,80,MW-80);
+      hero.y=clamp(hero.y+Math.sin(hero.angle)*210,80,MH-80);
+      shake=9;
+      createParticles(hero.x,hero.y,28,'#2ed573');
+      hitEnemiesInArea(hero.x,hero.y,140,sk.dmg);
     }else if(id==='ult'){
       playSfx('thunder');
-      shake=16;
+      shake=18;
       let targets=[...enemies,...minions.filter(m=>m.team==='red'),...towers.filter(t=>t.team==='red')].filter(e=>dist(hero,e)<sk.range);
       targets.forEach(t=>{
         t.hp=Math.max(0,t.hp-sk.dmg);
-        spawnFloatingText(t.x,t.y,sk.dmg,'#ff7675');
-        createParticles(t.x,t.y,18,'#ff7675');
+        spawnFloatingText(t.x,t.y,sk.dmg,'#ff4757');
+        createParticles(t.x,t.y,20,'#ff4757');
       });
     }
   }else if(chosen==='gojo'){
     if(id==='s1'){
       playSfx('beam');
-      const tx=hero.x+220,ty=hero.y;
-      createParticles(tx,ty,35,'#74b9ff');
+      const tx=hero.x+Math.cos(hero.angle)*230,ty=hero.y+Math.sin(hero.angle)*230;
+      createParticles(tx,ty,40,'#70a1ff');
       [...enemies,...minions.filter(m=>m.team==='red')].forEach(e=>{
         if(dist({x:tx,y:ty},e)<190){
           e.x+=(tx-e.x)*0.6;e.y+=(ty-e.y)*0.6;
           e.hp=Math.max(0,e.hp-sk.dmg);
-          spawnFloatingText(e.x,e.y,sk.dmg,'#74b9ff');
+          spawnFloatingText(e.x,e.y,sk.dmg,'#70a1ff');
         }
       });
     }else if(id==='s2'){
       playSfx('thunder');
-      shake=10;
-      createParticles(hero.x,hero.y,30,'#ff7675');
-      hitEnemiesInArea(hero.x,hero.y,160,sk.dmg);
+      shake=12;
+      createParticles(hero.x,hero.y,35,'#ff6b81');
+      hitEnemiesInArea(hero.x,hero.y,170,sk.dmg);
     }else if(id==='ult'){
-      playSfx('beam');shake=20;
-      shots.push({x:hero.x,y:hero.y,vx:420,vy:0,dmg:sk.dmg,team:'blue',life:1.6,color:'#a29bfe',r:40,pierce:true});
+      playSfx('beam');shake=22;
+      shots.push({x:hero.x,y:hero.y,vx:Math.cos(hero.angle)*440,vy:Math.sin(hero.angle)*440,dmg:sk.dmg,team:'blue',life:1.7,color:'#a55eea',r:44,pierce:true});
     }
   }else if(chosen==='raiden'){
     if(id==='s1'){
       playSfx('thunder');
-      shots.push({x:hero.x,y:hero.y,vx:550,vy:(joy.y||0)*200,dmg:sk.dmg,team:'blue',life:0.7,color:'#f1c40f',r:16});
+      shots.push({x:hero.x,y:hero.y,vx:Math.cos(hero.angle)*560,vy:Math.sin(hero.angle)*560,dmg:sk.dmg,team:'blue',life:0.7,color:'#f1c40f',r:18});
     }else if(id==='s2'){
       playSfx('dash');
-      hero.x=clamp(hero.x+220,80,MW-80);
-      shake=8;
-      createParticles(hero.x,hero.y,20,'#f1c40f');
-      hitEnemiesInArea(hero.x,hero.y,120,sk.dmg);
+      hero.x=clamp(hero.x+Math.cos(hero.angle)*220,80,MW-80);
+      hero.y=clamp(hero.y+Math.sin(hero.angle)*220,80,MH-80);
+      shake=9;
+      createParticles(hero.x,hero.y,24,'#f1c40f');
+      hitEnemiesInArea(hero.x,hero.y,130,sk.dmg);
     }else if(id==='ult'){
-      playSfx('thunder');shake=22;
+      playSfx('thunder');shake=24;
       [...enemies,...minions.filter(m=>m.team==='red'),core].forEach(t=>{
         if(dist(hero,t)<sk.range){
           t.hp=Math.max(0,t.hp-sk.dmg);
           spawnFloatingText(t.x,t.y,sk.dmg,'#f1c40f');
-          createParticles(t.x,t.y,25,'#f1c40f');
+          createParticles(t.x,t.y,28,'#f1c40f');
         }
       });
     }
@@ -349,7 +361,7 @@ function castSkill(id){
 
 function hitEnemiesInArea(x,y,radius,dmg){
   const pool=[...enemies,...minions.filter(m=>m.team==='red'),...towers.filter(t=>t.team==='red'&&t.hp>0),...camps.filter(c=>c.alive)];
-  if(core&&dist({x,y},core)<radius+30)pool.push(core);
+  if(core&&dist({x,y},core)<radius+35)pool.push(core);
   for(const e of pool){
     if(dist({x,y},e)<=radius){
       e.hp=Math.max(0,e.hp-dmg);
@@ -360,8 +372,8 @@ function hitEnemiesInArea(x,y,radius,dmg){
 
 function createParticles(x,y,count,color){
   for(let i=0;i<count;i++){
-    const ang=Math.random()*Math.PI*2,spd=40+Math.random()*160;
-    particles.push({x,y,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd,color,life:0.4+Math.random()*0.3});
+    const ang=Math.random()*Math.PI*2,spd=50+Math.random()*170;
+    particles.push({x,y,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd,color,life:0.45+Math.random()*0.3});
   }
 }
 
@@ -370,11 +382,12 @@ function createParticles(x,y,count,color){
    ========================================================================== */
 function update(dt){
   if(!running)return;
+  time+=dt;
 
   waveTimer-=dt;
   if(waveTimer<=0){
     spawnMinionWave();
-    waveTimer=22;
+    waveTimer=24;
   }
 
   attackCd=Math.max(0,attackCd-dt);
@@ -385,31 +398,33 @@ function update(dt){
   document.getElementById('cd-s2').style.height=(skillCds.s2/h.s2.cd*100)+'%';
   document.getElementById('cd-ult').style.height=(skillCds.ult/h.ult.cd*100)+'%';
 
-  // KEYBOARD WASD & JOYSTICK MOVEMENT: Fully case-insensitive!
-  let mx = joy.x;
-  let my = joy.y;
-
-  if (keys['arrowright'] || keys['d']) mx += 1;
-  if (keys['arrowleft']  || keys['a']) mx -= 1;
-  if (keys['arrowdown']  || keys['s']) my += 1;
-  if (keys['arrowup']    || keys['w']) my -= 1;
+  // INPUT & MOVEMENT
+  let mx=joy.x;
+  let my=joy.y;
+  if(keys['arrowright']||keys['d'])mx+=1;
+  if(keys['arrowleft'] ||keys['a'])mx-=1;
+  if(keys['arrowdown'] ||keys['s'])my+=1;
+  if(keys['arrowup']   ||keys['w'])my-=1;
 
   const len=Math.hypot(mx,my);
-  if(len>1){mx/=len;my/=len;}
-
-  hero.x=clamp(hero.x+mx*hero.speed*dt,60,MW-60);
-  hero.y=clamp(hero.y+my*hero.speed*dt,60,MH-60);
+  if(len>0.05){
+    const nx=mx/len,ny=my/len;
+    hero.x=clamp(hero.x+nx*hero.speed*dt,60,MW-60);
+    hero.y=clamp(hero.y+ny*hero.speed*dt,60,MH-60);
+    hero.angle=Math.atan2(ny,nx);
+    hero.walk+=dt*14;
+  }
 
   hero.inBush=bushes.some(b=>dist(hero,b)<b.r);
+  hero.hp=Math.min(hero.maxHp,hero.hp+9*dt);
+  hero.mp=Math.min(hero.maxMp,hero.mp+14*dt);
 
-  hero.hp=Math.min(hero.maxHp,hero.hp+8*dt);
-  hero.mp=Math.min(hero.maxMp,hero.mp+12*dt);
-
+  // Update Projectiles
   for(let i=shots.length-1;i>=0;i--){
     const s=shots[i];
     s.x+=s.vx*dt;s.y+=s.vy*dt;s.life-=dt;
     [...enemies,...minions.filter(m=>m.team==='red'),...towers.filter(t=>t.team==='red'&&t.hp>0),core].forEach(e=>{
-      if(dist(s,e)<s.r+20){
+      if(dist(s,e)<s.r+22){
         e.hp=Math.max(0,e.hp-s.dmg);
         spawnFloatingText(e.x,e.y,s.dmg,s.color);
         if(!s.pierce)s.life=0;
@@ -418,10 +433,12 @@ function update(dt){
     if(s.life<=0)shots.splice(i,1);
   }
 
+  // Update Minions
   for(const m of minions){
     if(m.hp<=0)continue;
+    m.walk+=dt*10;
     const foes=m.team==='blue'?[...enemies,...minions.filter(q=>q.team==='red')]:[hero,...minions.filter(q=>q.team==='blue')];
-    let target=null,minD=100;
+    let target=null,minD=m.type==='ranged'?160:70;
     for(const f of foes){
       const d=dist(m,f);
       if(d<minD){minD=d;target=f;}
@@ -438,35 +455,59 @@ function update(dt){
     }
   }
 
+  // Update Enemy Bots
+  for(const e of enemies){
+    if(e.hp<=0)continue;
+    e.walk+=dt*10;
+    const target=dist(e,hero)<350?hero:minions.filter(m=>m.team==='blue')[0];
+    if(target){
+      const d=dist(e,target);
+      e.angle=Math.atan2(target.y-e.y,target.x-e.x);
+      if(d>75){
+        e.x+=Math.cos(e.angle)*e.speed*dt;
+        e.y+=Math.sin(e.angle)*e.speed*dt;
+      }else{
+        e.cd-=dt;
+        if(e.cd<=0){
+          target.hp=Math.max(0,target.hp-e.damage);
+          e.cd=1.1;
+        }
+      }
+    }
+  }
+
+  // Update Towers
   for(const tw of towers){
     if(tw.hp<=0)continue;
     tw.cd-=dt;
     if(tw.cd<=0){
       const foes=tw.team==='blue'?[...enemies,...minions.filter(m=>m.team==='red')]:[hero,...minions.filter(m=>m.team==='blue')];
-      const target=foes.find(f=>dist(tw,f)<=tw.range&&(!f.inBush||f===hero&&dist(tw,f)<90));
+      const target=foes.find(f=>dist(tw,f)<=tw.range&&(!f.inBush||f===hero&&dist(tw,f)<95));
       if(target){
         target.hp=Math.max(0,target.hp-tw.damage);
-        tw.cd=1.3;
-        createParticles(target.x,target.y,8,tw.team==='blue'?'#54a0ff':'#ff6b6b');
+        tw.cd=1.25;
+        createParticles(target.x,target.y,8,tw.team==='blue'?'#70a1ff':'#ff6b81');
       }
     }
   }
 
+  // Update Jungle Camps
   for(const c of camps){
     if(!c.alive){
       c.respawn-=dt;
       if(c.respawn<=0){c.alive=true;c.hp=c.maxHp;}
       continue;
     }
-    if(dist(c,hero)<140){
+    if(dist(c,hero)<145){
       c.cd-=dt;
       if(c.cd<=0){
         hero.hp=Math.max(0,hero.hp-c.damage);
-        c.cd=1.4;
+        c.cd=1.35;
       }
     }
   }
 
+  // Floats & Particles
   for(let i=floats.length-1;i>=0;i--){
     const f=floats[i];f.y+=f.vy*dt;f.life-=dt;
     if(f.life<=0)floats.splice(i,1);
@@ -481,12 +522,12 @@ function update(dt){
 
   if(core.hp<=0){
     running=false;
-    document.getElementById('message').textContent='VICTORY! The Enemy Core has fallen!';
+    document.getElementById('message').textContent='VICTORY! Enemy Core obliterated!';
     document.getElementById('start').style.display='flex';
     document.getElementById('play').textContent='PLAY AGAIN';
   }else if(hero.hp<=0){
     running=false;
-    document.getElementById('message').textContent='DEFEAT! Your Champion fell in battle!';
+    document.getElementById('message').textContent='DEFEAT! Your Champion has fallen!';
     document.getElementById('start').style.display='flex';
     document.getElementById('play').textContent='TRY AGAIN';
   }
@@ -498,71 +539,301 @@ function update(dt){
 }
 
 /* ==========================================================================
-   RENDER 2.5D
+   RENDER 2.5D REALISTIC TERRAIN & MODELS
    ========================================================================== */
 function drawTerrain(){
-  ctx.fillStyle='#1e3a29';
+  // 1. Lush Grass Field with Isometric Grid Texture
+  ctx.fillStyle='#183321';
   ctx.fillRect(0,0,MW,MH);
 
-  ctx.lineWidth=78;ctx.lineCap='round';ctx.strokeStyle='#4a5568';
-  ctx.beginPath();ctx.moveTo(100,250);ctx.lineTo(MW-100,250);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(100,700);ctx.lineTo(MW-100,700);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(100,1150);ctx.lineTo(MW-100,1150);ctx.stroke();
+  // Subtle checker ground tiles
+  ctx.fillStyle='#1c3c27';
+  for(let y=0;y<MH;y+=90){
+    for(let x=0;x<MW;x+=90){
+      if((x/90+y/90)%2===0)ctx.fillRect(x,y,90,90);
+    }
+  }
 
-  ctx.beginPath();ctx.moveTo(200,700);ctx.lineTo(380,250);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(200,700);ctx.lineTo(380,1150);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(MW-200,700);ctx.lineTo(MW-380,250);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(MW-200,700);ctx.lineTo(MW-380,1150);ctx.stroke();
+  // 2. Realistic 3 Cobblestone Lanes (Top, Mid, Bot)
+  const drawRoad=(x1,y1,x2,y2,w=84)=>{
+    // Road border curbs
+    ctx.lineWidth=w+16;ctx.lineCap='round';ctx.strokeStyle='#2d3436';
+    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+    // Inner cobblestone
+    ctx.lineWidth=w;ctx.strokeStyle='#57606f';
+    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+    // Center stone pavers
+    ctx.lineWidth=w-24;ctx.strokeStyle='#747d8c';
+    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+  };
 
-  ctx.strokeStyle='#1b728d';ctx.lineWidth=95;
+  drawRoad(120,260,MW-120,260);
+  drawRoad(120,750,MW-120,750);
+  drawRoad(120,1240,MW-120,1240);
+
+  // Lane Connectors from bases
+  drawRoad(220,750,420,260,72);
+  drawRoad(220,750,420,1240,72);
+  drawRoad(MW-220,750,MW-420,260,72);
+  drawRoad(MW-220,750,MW-420,1240,72);
+
+  // 3. Shimmering River with Moving Water Lines
+  ctx.strokeStyle='#1b4965';ctx.lineWidth=120;
   ctx.beginPath();
-  ctx.moveTo(1250,20);
-  ctx.bezierCurveTo(1100,450,900,950,750,MH-20);
+  ctx.moveTo(1350,20);
+  ctx.bezierCurveTo(1200,480,1000,1020,850,MH-20);
   ctx.stroke();
 
-  for(const y of [250,700,1150]){
-    const bx=y===250?1160:y===700?1000:840;
-    ctx.fillStyle='#855a30';
-    ctx.fillRect(bx-45,y-38,90,76);
-    ctx.strokeStyle='#523417';ctx.lineWidth=3;
-    ctx.strokeRect(bx-45,y-38,90,76);
+  ctx.strokeStyle='#62b6cb';ctx.lineWidth=90;
+  ctx.beginPath();
+  ctx.moveTo(1350,20);
+  ctx.bezierCurveTo(1200,480,1000,1020,850,MH-20);
+  ctx.stroke();
+
+  // Water current wave ripples
+  ctx.strokeStyle='rgba(255,255,255,0.4)';ctx.lineWidth=3;
+  for(let i=0;i<10;i++){
+    const rx=1100+Math.sin(time*2+i)*120;
+    const ry=120+i*130;
+    ctx.beginPath();ctx.arc(rx,ry,28,0.2,1.8);ctx.stroke();
   }
 
-  for(const b of bushes){
-    ctx.fillStyle='#27ae60aa';
-    ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='#2ecc71';
-    ctx.beginPath();ctx.arc(b.x-8,b.y-4,b.r*0.65,0,Math.PI*2);ctx.fill();
+  // 4. Wooden Bridges with Planks & Railings
+  for(const y of [260,750,1240]){
+    const bx=y===260?1260:y===750?1100:940;
+    ctx.fillStyle='#3d2314';ctx.fillRect(bx-50,y-44,100,88);
+    ctx.fillStyle='#855a30';ctx.fillRect(bx-45,y-40,90,80);
+    // Planks
+    ctx.strokeStyle='#4a311c';ctx.lineWidth=3;
+    for(let px=-40;px<=40;px+=16){
+      ctx.beginPath();ctx.moveTo(bx+px,y-40);ctx.lineTo(bx+px,y+40);ctx.stroke();
+    }
+    // Railings
+    ctx.fillStyle='#eccc68';
+    ctx.fillRect(bx-45,y-42,90,4);ctx.fillRect(bx-45,y+38,90,4);
   }
+
+  // 5. Leafy Bush Stealth Clusters
+  for(const b of bushes){
+    ctx.fillStyle='rgba(13,38,20,0.5)';
+    ctx.beginPath();ctx.ellipse(b.x+4,b.y+8,b.r+8,b.r*0.6,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#1e824c';
+    ctx.beginPath();ctx.arc(b.x-10,b.y,b.r*0.75,0,Math.PI*2);
+    ctx.arc(b.x+10,b.y,b.r*0.75,0,Math.PI*2);
+    ctx.arc(b.x,b.y-8,b.r*0.85,0,Math.PI*2);
+    ctx.fill();
+    ctx.fillStyle='#2ecc71';
+    ctx.beginPath();ctx.arc(b.x-4,b.y-4,b.r*0.5,0,Math.PI*2);ctx.fill();
+  }
+}
+
+// Procedural Realistic Character Renderer
+function drawHeroCharacter(h,p){
+  ctx.save();
+  if(h.inBush)ctx.globalAlpha=0.45;
+
+  // Cast shadow
+  ctx.fillStyle='rgba(0,0,0,0.4)';
+  ctx.beginPath();ctx.ellipse(p.x,p.y+7,22,11,0,0,Math.PI*2);ctx.fill();
+
+  const cos=Math.cos(h.angle),sin=Math.sin(h.angle);
+  const step=Math.sin(h.walk)*4;
+
+  // Legs/Feet
+  ctx.fillStyle='#2f3542';
+  ctx.fillRect(p.x-7-sin*4,p.y-3+step,5,8);
+  ctx.fillRect(p.x+2+sin*4,p.y-3-step,5,8);
+
+  // Body / Armor Cloak
+  ctx.fillStyle=h.color;
+  ctx.beginPath();ctx.ellipse(p.x,p.y-14,14,16,0,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.stroke();
+
+  // Torso detail / belt
+  ctx.fillStyle='#1e272e';
+  ctx.fillRect(p.x-8,p.y-10,16,4);
+
+  // Head & Anime Hair
+  ctx.fillStyle='#ffd8a8'; // Skin
+  ctx.beginPath();ctx.arc(p.x,p.y-26,9,0,Math.PI*2);ctx.fill();
+  
+  // Spiky Anime Hair / Headband
+  ctx.fillStyle=chosen==='gojo'?'#f1f2f6':chosen==='ryu'?'#2f3542':'#f1c40f';
+  ctx.beginPath();
+  ctx.arc(p.x,p.y-29,9.5,Math.PI,Math.PI*2);
+  ctx.lineTo(p.x+12,p.y-25);
+  ctx.lineTo(p.x-12,p.y-25);
+  ctx.fill();
+
+  // Floating Headband / Scarf Tails
+  ctx.strokeStyle=h.color;ctx.lineWidth=3;
+  ctx.beginPath();
+  ctx.moveTo(p.x-cos*8,p.y-25);
+  ctx.quadraticCurveTo(p.x-cos*22,p.y-22+Math.sin(time*8)*5,p.x-cos*32,p.y-24);
+  ctx.stroke();
+
+  // Weapon in Hand (Directed at angle)
+  const wx=p.x+cos*16,wy=p.y-16+sin*16;
+  ctx.save();
+  ctx.translate(wx,wy);
+  ctx.rotate(h.angle);
+  if(chosen==='ryu'){
+    // Katana Blade
+    ctx.fillStyle='#ced6e0';ctx.fillRect(0,-2,24,3);
+    ctx.fillStyle='#2ed573';ctx.shadowColor='#2ed573';ctx.shadowBlur=8;
+    ctx.fillRect(2,-1,20,1.5);
+  }else if(chosen==='gojo'){
+    // Void Orbs
+    ctx.fillStyle='#a55eea';ctx.shadowColor='#a55eea';ctx.shadowBlur=12;
+    ctx.beginPath();ctx.arc(Math.sin(time*6)*12,Math.cos(time*6)*12,6,0,Math.PI*2);ctx.fill();
+  }else if(chosen==='raiden'){
+    // Thunder Spear
+    ctx.fillStyle='#f1c40f';ctx.shadowColor='#f1c40f';ctx.shadowBlur=10;
+    ctx.fillRect(-4,-2,28,4);
+  }
+  ctx.restore();
+
+  // HP Bar overhead
+  const bw=38,bh=4;
+  ctx.fillStyle='#000';ctx.fillRect(p.x-bw/2,p.y-44,bw,bh);
+  ctx.fillStyle='#2ed573';ctx.fillRect(p.x-bw/2,p.y-44,bw*(h.hp/h.maxHp),bh);
+  ctx.strokeStyle='#fff';ctx.lineWidth=0.8;ctx.strokeRect(p.x-bw/2,p.y-44,bw,bh);
+
+  ctx.restore();
+}
+
+// Procedural Realistic Minion Renderer
+function drawMinionCharacter(m,p){
+  ctx.save();
+  const blue=m.team==='blue';
+
+  // Drop shadow
+  ctx.fillStyle='rgba(0,0,0,0.35)';
+  ctx.beginPath();ctx.ellipse(p.x,p.y+4,12,6,0,0,Math.PI*2);ctx.fill();
+
+  const step=Math.sin(m.walk)*3;
+
+  if(m.type==='melee'){
+    // Armored Swordsman Minion
+    ctx.fillStyle=blue?'#3742fa':'#eb4d4b';
+    ctx.beginPath();ctx.arc(p.x,p.y-10,9,0,Math.PI*2);ctx.fill();
+
+    // Helmet with crest
+    ctx.fillStyle='#747d8c';
+    ctx.fillRect(p.x-6,p.y-17,12,6);
+    ctx.fillStyle=blue?'#70a1ff':'#ff6b81';
+    ctx.fillRect(p.x-2,p.y-21,4,5);
+
+    // Shield
+    ctx.fillStyle='#2f3542';ctx.strokeStyle='#dcdde1';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.ellipse(p.x-8,p.y-9+step,4,7,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+
+    // Sword
+    ctx.fillStyle='#f1f2f6';
+    ctx.fillRect(p.x+7,p.y-15-step,3,12);
+  }else{
+    // Hooded Caster Minion
+    ctx.fillStyle=blue?'#1e90ff':'#c0392b';
+    ctx.beginPath();
+    ctx.moveTo(p.x,p.y-18);
+    ctx.lineTo(p.x+9,p.y-3);
+    ctx.lineTo(p.x-9,p.y-3);
+    ctx.closePath();ctx.fill();
+
+    // Glowing Magic Orb Staff
+    ctx.fillStyle='#57606f';ctx.fillRect(p.x+6,p.y-18,2,16);
+    ctx.fillStyle=blue?'#7bed9f':'#ff4757';ctx.shadowColor=ctx.fillStyle;ctx.shadowBlur=8;
+    ctx.beginPath();ctx.arc(p.x+7,p.y-19,4,0,Math.PI*2);ctx.fill();
+    ctx.shadowBlur=0;
+  }
+
+  // Mini HP Bar
+  const bw=22;
+  ctx.fillStyle='#000';ctx.fillRect(p.x-bw/2,p.y-26,bw,3);
+  ctx.fillStyle=blue?'#2ed573':'#ff4757';ctx.fillRect(p.x-bw/2,p.y-26,bw*Math.max(0,m.hp/m.maxHp),3);
+
+  ctx.restore();
+}
+
+// Procedural Realistic Multi-Tier Tower
+function drawTowerStructure(tw,p){
+  const blue=tw.team==='blue';
+  ctx.save();
+
+  // Shadow
+  ctx.fillStyle='rgba(0,0,0,0.4)';
+  ctx.beginPath();ctx.ellipse(p.x,p.y+12,28,14,0,0,Math.PI*2);ctx.fill();
+
+  // Tier 1 Base (Hewn Stone)
+  ctx.fillStyle='#2f3542';
+  ctx.beginPath();
+  ctx.moveTo(p.x-24,p.y+6);ctx.lineTo(p.x+24,p.y+6);
+  ctx.lineTo(p.x+18,p.y-18);ctx.lineTo(p.x-18,p.y-18);
+  ctx.closePath();ctx.fill();
+  ctx.strokeStyle='#57606f';ctx.lineWidth=2;ctx.stroke();
+
+  // Tier 2 Pillar Shaft
+  ctx.fillStyle='#47535e';
+  ctx.fillRect(p.x-13,p.y-48,26,30);
+  ctx.fillStyle=blue?'#1e90ff':'#eb4d4b';
+  ctx.fillRect(p.x-4,p.y-44,8,24);
+
+  // Tier 3 Floating Crystal Spire
+  const bob=Math.sin(time*4+(tw.x+tw.y))*4;
+  const crystalColor=blue?'#70a1ff':'#ff6b81';
+  ctx.fillStyle=crystalColor;ctx.shadowColor=crystalColor;ctx.shadowBlur=16;
+  ctx.beginPath();
+  ctx.moveTo(p.x,p.y-68+bob);
+  ctx.lineTo(p.x+10,p.y-54+bob);
+  ctx.lineTo(p.x,p.y-40+bob);
+  ctx.lineTo(p.x-10,p.y-54+bob);
+  ctx.closePath();ctx.fill();
+  ctx.shadowBlur=0;
+
+  // HP Bar
+  const bw=42;
+  ctx.fillStyle='#000';ctx.fillRect(p.x-bw/2,p.y-78,bw,5);
+  ctx.fillStyle=blue?'#2ed573':'#ff4757';ctx.fillRect(p.x-bw/2,p.y-78,bw*(tw.hp/tw.maxHp),5);
+  ctx.strokeStyle='#fff';ctx.lineWidth=0.8;ctx.strokeRect(p.x-bw/2,p.y-78,bw,5);
+
+  ctx.restore();
 }
 
 function drawMiniMap(){
   mmCtx.clearRect(0,0,mm.width,mm.height);
-  mmCtx.fillStyle='#0f1c29';mmCtx.fillRect(0,0,mm.width,mm.height);
+  mmCtx.fillStyle='#0a101a';mmCtx.fillRect(0,0,mm.width,mm.height);
 
   const sx=mm.width/MW,sy=mm.height/MH;
 
-  mmCtx.strokeStyle='#4a5568';mmCtx.lineWidth=2;
+  // Draw 3 Lanes
+  mmCtx.strokeStyle='#57606f';mmCtx.lineWidth=2;
   mmCtx.beginPath();
-  mmCtx.moveTo(0,250*sy);mmCtx.lineTo(mm.width,250*sy);
-  mmCtx.moveTo(0,700*sy);mmCtx.lineTo(mm.width,700*sy);
-  mmCtx.moveTo(0,1150*sy);mmCtx.lineTo(mm.width,1150*sy);
+  mmCtx.moveTo(0,260*sy);mmCtx.lineTo(mm.width,260*sy);
+  mmCtx.moveTo(0,750*sy);mmCtx.lineTo(mm.width,750*sy);
+  mmCtx.moveTo(0,1240*sy);mmCtx.lineTo(mm.width,1240*sy);
   mmCtx.stroke();
 
+  // River
+  mmCtx.strokeStyle='#1e90ff44';mmCtx.lineWidth=3;
+  mmCtx.beginPath();mmCtx.moveTo(mm.width*0.65,0);mmCtx.lineTo(mm.width*0.35,mm.height);mmCtx.stroke();
+
+  // Towers
   for(const tw of towers){
     if(tw.hp<=0)continue;
-    mmCtx.fillStyle=tw.team==='blue'?'#54a0ff':'#ff6b6b';
+    mmCtx.fillStyle=tw.team==='blue'?'#70a1ff':'#ff6b81';
     mmCtx.fillRect(tw.x*sx-1.5,tw.y*sy-1.5,3,3);
   }
 
+  // Minions
   for(const m of minions){
-    mmCtx.fillStyle=m.team==='blue'?'#00d2d3':'#ee5253';
+    mmCtx.fillStyle=m.team==='blue'?'#2ed573':'#ff4757';
     mmCtx.fillRect(m.x*sx-1,m.y*sy-1,2,2);
   }
 
+  // Hero (Bright Yellow dot with ring)
   if(hero){
-    mmCtx.fillStyle='#ffdc78';
-    mmCtx.beginPath();mmCtx.arc(hero.x*sx,hero.y*sy,3,0,Math.PI*2);mmCtx.fill();
+    mmCtx.fillStyle='#f1c40f';
+    mmCtx.beginPath();mmCtx.arc(hero.x*sx,hero.y*sy,3.5,0,Math.PI*2);mmCtx.fill();
   }
 }
 
@@ -576,96 +847,107 @@ function draw(){
     shake*=0.88;
   }
 
-  const camX=hero?project(hero.x,hero.y).x:500;
+  const camX=hero?project(hero.x,hero.y).x:580;
   const camY=hero?project(hero.x,hero.y).y:300;
-  const zoom=Math.min(1.2,Math.max(0.9,H/700));
+  const zoom=Math.min(1.22,Math.max(0.92,H/700));
 
   ctx.save();
   ctx.translate(W*0.5-camX*zoom+ox, H*0.48-camY*zoom+oy);
   ctx.scale(zoom,zoom);
 
+  // 1. Isometric Ground Terrain
   ctx.save();
-  ctx.transform(0.65, 0.32, -0.65, 0.32, 550, 40);
+  ctx.transform(0.65, 0.32, -0.65, 0.32, 580, 45);
   drawTerrain();
   ctx.restore();
 
+  // 2. Towers
   for(const tw of towers){
     if(tw.hp<=0)continue;
-    const p=project(tw.x,tw.y),blue=tw.team==='blue';
-    ctx.fillStyle='rgba(0,0,0,0.3)';
-    ctx.beginPath();ctx.ellipse(p.x,p.y+8,22,12,0,0,Math.PI*2);ctx.fill();
-
-    ctx.fillStyle=blue?'#2980b9':'#c0392b';
-    ctx.fillRect(p.x-14,p.y-42,28,42);
-    ctx.fillStyle=blue?'#54a0ff':'#ff6b6b';
-    ctx.beginPath();ctx.arc(p.x,p.y-44,14,0,Math.PI*2);ctx.fill();
-
-    ctx.fillStyle='#000';ctx.fillRect(p.x-18,p.y-62,36,4);
-    ctx.fillStyle=blue?'#2ecc71':'#e74c3c';
-    ctx.fillRect(p.x-18,p.y-62,36*(tw.hp/tw.maxHp),4);
+    drawTowerStructure(tw,project(tw.x,tw.y));
   }
 
+  // 3. Enemy Core Nexus Altar
   if(core&&core.hp>0){
     const cp=project(core.x,core.y);
-    ctx.fillStyle='#c0392b';
-    ctx.beginPath();ctx.arc(cp.x,cp.y-25,32,0,Math.PI*2);ctx.fill();
-    ctx.strokeStyle='#ff7675';ctx.lineWidth=4;ctx.stroke();
-  }
+    ctx.fillStyle='rgba(0,0,0,0.5)';
+    ctx.beginPath();ctx.ellipse(cp.x,cp.y+14,45,22,0,0,Math.PI*2);ctx.fill();
 
-  for(const c of camps){
-    if(!c.alive)continue;
-    const p=project(c.x,c.y);
-    ctx.fillStyle=c.color;
-    ctx.beginPath();ctx.arc(p.x,p.y-14,c.r*0.75,0,Math.PI*2);ctx.fill();
-    ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
+    // Ancient Stone Hexagon
+    ctx.fillStyle='#2f3542';ctx.strokeStyle='#ff4757';ctx.lineWidth=4;
+    ctx.beginPath();ctx.arc(cp.x,cp.y-10,34,0,Math.PI*2);ctx.fill();ctx.stroke();
 
-    ctx.fillStyle='#fff';ctx.font='bold 9px sans-serif';ctx.textAlign='center';
-    ctx.fillText(c.name,p.x,p.y-26);
-  }
-
-  for(const m of minions){
-    if(m.hp<=0)continue;
-    const p=project(m.x,m.y);
-    ctx.fillStyle=m.color;
-    ctx.beginPath();ctx.arc(p.x,p.y-6,m.r*0.7,0,Math.PI*2);ctx.fill();
-  }
-
-  for(const s of shots){
-    const sp=project(s.x,s.y);
-    ctx.fillStyle=s.color;ctx.shadowColor=s.color;ctx.shadowBlur=12;
-    ctx.beginPath();ctx.arc(sp.x,sp.y-10,s.r*0.75,0,Math.PI*2);ctx.fill();
-    ctx.shadowBlur=0;
-  }
-
-  if(hero){
-    const hp=project(hero.x,hero.y);
+    // Giant Rotating Molten Core
     ctx.save();
-    if(hero.inBush)ctx.globalAlpha=0.45;
-
-    ctx.fillStyle='rgba(0,0,0,0.35)';
-    ctx.beginPath();ctx.ellipse(hp.x,hp.y+6,20,10,0,0,Math.PI*2);ctx.fill();
-
-    ctx.strokeStyle=hero.color;ctx.lineWidth=3;ctx.shadowColor=hero.color;ctx.shadowBlur=15;
-    ctx.beginPath();ctx.ellipse(hp.x,hp.y-10,hero.r,hero.r*0.65,0,0,Math.PI*2);ctx.stroke();
-    ctx.shadowBlur=0;
-
-    ctx.fillStyle=hero.color;
-    ctx.beginPath();ctx.arc(hp.x,hp.y-15,hero.r*0.75,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='#111';ctx.font='bold 14px sans-serif';ctx.textAlign='center';
-    ctx.fillText(hero.glyph,hp.x,hp.y-10);
+    ctx.translate(cp.x,cp.y-34+Math.sin(time*3)*6);
+    ctx.rotate(time*1.5);
+    ctx.fillStyle='#eb4d4b';ctx.shadowColor='#eb4d4b';ctx.shadowBlur=22;
+    ctx.fillRect(-16,-16,32,32);
+    ctx.fillStyle='#ffa502';ctx.fillRect(-10,-10,20,20);
     ctx.restore();
   }
 
+  // 4. Jungle Monsters
+  for(const c of camps){
+    if(!c.alive)continue;
+    const p=project(c.x,c.y);
+    ctx.fillStyle='rgba(0,0,0,0.4)';
+    ctx.beginPath();ctx.ellipse(p.x,p.y+6,20,10,0,0,Math.PI*2);ctx.fill();
+
+    // Body
+    ctx.fillStyle=c.color;ctx.shadowColor=c.color;ctx.shadowBlur=12;
+    ctx.beginPath();ctx.arc(p.x,p.y-16,c.r*0.75,0,Math.PI*2);ctx.fill();
+    ctx.shadowBlur=0;
+    ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
+
+    // Horns / Spikes
+    ctx.fillStyle='#f1f2f6';
+    ctx.beginPath();
+    ctx.moveTo(p.x-12,p.y-26);ctx.lineTo(p.x-6,p.y-18);ctx.lineTo(p.x-14,p.y-16);
+    ctx.moveTo(p.x+12,p.y-26);ctx.lineTo(p.x+6,p.y-18);ctx.lineTo(p.x+14,p.y-16);
+    ctx.fill();
+
+    ctx.fillStyle='#fff';ctx.font='bold 9px system-ui';ctx.textAlign='center';
+    ctx.fillText(c.name,p.x,p.y-34);
+  }
+
+  // 5. Minions
+  for(const m of minions){
+    if(m.hp<=0)continue;
+    drawMinionCharacter(m,project(m.x,m.y));
+  }
+
+  // 6. Enemy Bots
+  for(const e of enemies){
+    if(e.hp<=0)continue;
+    drawHeroCharacter(e,project(e.x,e.y));
+  }
+
+  // 7. Hero
+  if(hero) drawHeroCharacter(hero,project(hero.x,hero.y));
+
+  // 8. Projectiles / Anime Energy Beams
+  for(const s of shots){
+    const sp=project(s.x,s.y);
+    ctx.fillStyle=s.color;ctx.shadowColor=s.color;ctx.shadowBlur=16;
+    ctx.beginPath();ctx.arc(sp.x,sp.y-12,s.r*0.75,0,Math.PI*2);ctx.fill();
+    ctx.shadowBlur=0;
+  }
+
+  // 9. Floating Combat Damage Numbers
+  for(const f of floats){
+    const fp=project(f.x,f.y);
+    ctx.fillStyle=f.color;ctx.font='bold 15px system-ui';ctx.textAlign='center';
+    ctx.shadowColor='#000';ctx.shadowBlur=4;
+    ctx.fillText(f.text,fp.x,fp.y);
+    ctx.shadowBlur=0;
+  }
+
+  // 10. Particles
   for(const p of particles){
     const pp=project(p.x,p.y);
     ctx.fillStyle=p.color;
     ctx.beginPath();ctx.arc(pp.x,pp.y,3,0,Math.PI*2);ctx.fill();
-  }
-
-  for(const f of floats){
-    const fp=project(f.x,f.y);
-    ctx.fillStyle=f.color;ctx.font='bold 14px sans-serif';ctx.textAlign='center';
-    ctx.fillText(f.text,fp.x,fp.y);
   }
 
   ctx.restore();
@@ -682,7 +964,7 @@ function loop(now){
 }
 
 /* ==========================================================================
-   FIXED TOUCH & JOYSTICK CONTROLLER (100% Mobile & PC Responsive)
+   JOYSTICK & TOUCH CONTROLS
    ========================================================================== */
 const joyEl=document.getElementById('joy'),stick=document.getElementById('stick');
 
@@ -720,24 +1002,21 @@ function handleJoyEnd(){
   stick.style.transform='translate(0px, 0px)';
 }
 
-// Touch events for mobile
 joyEl.addEventListener('touchstart', e=>{ e.preventDefault(); handleJoyStart(e); }, {passive:false});
 window.addEventListener('touchmove', e=>{ if(drag){ e.preventDefault(); handleJoyMove(e); } }, {passive:false});
 window.addEventListener('touchend', handleJoyEnd);
 window.addEventListener('touchcancel', handleJoyEnd);
 
-// Mouse fallback for PC testing
 joyEl.addEventListener('mousedown', handleJoyStart);
 window.addEventListener('mousemove', handleJoyMove);
 window.addEventListener('mouseup', handleJoyEnd);
 
-// Action Buttons
+// Buttons
 document.getElementById('attack').addEventListener('pointerdown',e=>{e.preventDefault();basicAttack();});
 document.getElementById('s1').addEventListener('pointerdown',e=>{e.preventDefault();castSkill('s1');});
 document.getElementById('s2').addEventListener('pointerdown',e=>{e.preventDefault();castSkill('s2');});
 document.getElementById('ult').addEventListener('pointerdown',e=>{e.preventDefault();castSkill('ult');});
 
-// Champion Picker UI
 document.querySelectorAll('.hero-card').forEach(b=>{
   b.addEventListener('click',()=>{
     document.querySelectorAll('.hero-card').forEach(q=>q.classList.remove('sel'));
@@ -747,7 +1026,7 @@ document.querySelectorAll('.hero-card').forEach(b=>{
 });
 document.getElementById('play').addEventListener('click',resetGame);
 
-// PC Keyboard Support (Fully Case-Insensitive)
+// PC Keyboard
 addEventListener('keydown',e=>{
   const k = e.key.toLowerCase();
   keys[k] = true;
